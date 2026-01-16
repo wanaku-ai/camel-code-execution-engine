@@ -70,7 +70,7 @@ public class App implements Callable<Integer> {
 
     private ServiceTarget newServiceTarget() {
         String address = DiscoveryHelper.resolveRegistrationAddress(registrationAnnounceAddress);
-        return ServiceTarget.newEmptyTarget(name, address, grpcPort, ServiceType.MULTI_CAPABILITY.asValue());
+        return ServiceTarget.newEmptyTarget(name, address, grpcPort, ServiceType.CODE_EXECUTION_ENGINE.asValue(), "camel", "yaml", null, null);
     }
 
     public RegistrationManager newRegistrationManager(ServiceTarget serviceTarget, ServiceConfig serviceConfig) {

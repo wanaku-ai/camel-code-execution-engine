@@ -15,6 +15,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
     @Override
     public void executeCode(CodeExecutionRequest request, StreamObserver<CodeExecutionReply> responseObserver) {
         LOG.info("Received code execution request for URI: {}", request.getUri());
+        LOG.info("Received code to execute: {}", request.getCode());
 
         try {
             long timestamp = System.currentTimeMillis();
@@ -26,6 +27,19 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                     .setStatus(ExecutionStatus.RUNNING)
                     .setTimestamp(timestamp)
                     .build());
+
+            for (int i = 0; i < 10; i++) {
+                LOG.info("Running code {}", i);
+                responseObserver.onNext(CodeExecutionReply.newBuilder()
+                        .setIsError(false)
+                        .addContent("Code execution running " + i)
+                        .setOutputType(OutputType.STATUS)
+                        .setStatus(ExecutionStatus.RUNNING)
+                        .setTimestamp(timestamp)
+                        .build());
+
+                Thread.sleep(1000);
+            }
 
             responseObserver.onNext(CodeExecutionReply.newBuilder()
                     .setIsError(false)

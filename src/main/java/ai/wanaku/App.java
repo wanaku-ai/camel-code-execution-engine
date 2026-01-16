@@ -13,10 +13,18 @@ import ai.wanaku.capabilities.sdk.discovery.config.DefaultRegistrationConfig;
 import ai.wanaku.capabilities.sdk.discovery.deserializer.JacksonDeserializer;
 import ai.wanaku.capabilities.sdk.discovery.util.DiscoveryHelper;
 import ai.wanaku.capabilities.sdk.security.TokenEndpoint;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.grpc.CodeExecutorService;
+import ai.wanaku.grpc.ProvisionBase;
+import ai.wanaku.init.Initializer;
+import ai.wanaku.init.InitializerFactory;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +70,15 @@ public class App implements Callable<Integer> {
     @CommandLine.Option(names = {"--client-secret"}, description = "The client secret authentication", required = true)
     private String clientSecret;
 
+    @CommandLine.Option(names = {"--data-dir"}, description = "The data directory to use", defaultValue = "/tmp/cee")
+    private String dataDir;
+
+    @CommandLine.Option(names = {"--init-from"}, description = "Git repository URL to clone on startup", required = false)
+    private String initFrom;
+
+    @CommandLine.Option(names = {"--repositories"}, description = "Maven repositories to use", required = false)
+    private String repositories;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new App()).execute(args);
 
@@ -70,7 +87,7 @@ public class App implements Callable<Integer> {
 
     private ServiceTarget newServiceTarget() {
         String address = DiscoveryHelper.resolveRegistrationAddress(registrationAnnounceAddress);
-        return ServiceTarget.newEmptyTarget(name, address, grpcPort, ServiceType.MULTI_CAPABILITY.asValue());
+        return ServiceTarget.newEmptyTarget(name, address, grpcPort, ServiceType.CODE_EXECUTION_ENGINE.asValue(), "camel", "yaml", null, null);
     }
 
     public RegistrationManager newRegistrationManager(ServiceTarget serviceTarget, ServiceConfig serviceConfig) {
@@ -96,6 +113,16 @@ public class App implements Callable<Integer> {
     public Integer call() throws Exception {
         LOG.info("Code Execution Engine is starting");
 
+        // 1. Create the data directory first (needed by initializers and workspace)
+        Path dataDirPath = Paths.get(dataDir);
+        Files.createDirectories(dataDirPath);
+        LOG.info("Using data directory: {}", dataDirPath.toAbsolutePath());
+
+        // 2. Resource initialization (Git clone if specified)
+        Initializer initializer = InitializerFactory.createInitializer(initFrom, dataDirPath);
+        initializer.initialize();
+
+        // 3. Create ServiceConfig for authentication
         final ServiceConfig serviceConfig = DefaultServiceConfig.Builder.newBuilder()
                 .baseUrl(registrationUrl)
                 .serializer(new JacksonSerializer())
@@ -104,16 +131,24 @@ public class App implements Callable<Integer> {
                 .secret(clientSecret)
                 .build();
 
+        // 4. Create ServicesHttpClient for downloading resources
+        ServicesHttpClient servicesHttpClient = new ServicesHttpClient(serviceConfig);
+
+        // 5. Create ServiceTarget and RegistrationManager
         final ServiceTarget serviceTarget = newServiceTarget();
         RegistrationManager registrationManager = newRegistrationManager(serviceTarget, serviceConfig);
 
         try {
+            // 6. Create and start gRPC server with CodeExecutorService
             final ServerBuilder<?> serverBuilder = Grpc.newServerBuilderForPort(grpcPort, InsecureServerCredentials.create());
-            final Server server = serverBuilder.addService(new CodeExecutorService())
+            final Server server = serverBuilder
+                    .addService(new CodeExecutorService(servicesHttpClient, dataDirPath, repositories))
                     .addService(new ProvisionBase(name))
                     .build();
 
+            LOG.info("Starting gRPC server on port {}", grpcPort);
             server.start();
+            LOG.info("Code Execution Engine started successfully");
             server.awaitTermination();
         } finally {
             registrationManager.deregister();

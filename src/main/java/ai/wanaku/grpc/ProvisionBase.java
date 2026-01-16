@@ -1,4 +1,4 @@
-package ai.wanaku;
+package ai.wanaku.grpc;
 
 import ai.wanaku.capabilities.sdk.config.provider.api.ConfigProvisioner;
 import ai.wanaku.capabilities.sdk.config.provider.api.ProvisionedConfig;

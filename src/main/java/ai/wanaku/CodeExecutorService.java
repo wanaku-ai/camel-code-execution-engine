@@ -20,6 +20,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         try {
             long timestamp = System.currentTimeMillis();
 
+            // Initial status notification
             responseObserver.onNext(CodeExecutionReply.newBuilder()
                     .setIsError(false)
                     .addContent("Code execution started")
@@ -28,27 +29,20 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                     .setTimestamp(timestamp)
                     .build());
 
-            for (int i = 0; i < 10; i++) {
-                LOG.info("Running code {}", i);
-                responseObserver.onNext(CodeExecutionReply.newBuilder()
-                        .setIsError(false)
-                        .addContent("Code execution running " + i)
-                        .setOutputType(OutputType.STATUS)
-                        .setStatus(ExecutionStatus.RUNNING)
-                        .setTimestamp(timestamp)
-                        .build());
+            // Execute the Camel YAML route
+            CamelRouteRunner runner = new CamelRouteRunner();
+            runner.runCamelRoute(request.getCode());
 
-                Thread.sleep(1000);
-            }
-
+            // Success notification
             responseObserver.onNext(CodeExecutionReply.newBuilder()
                     .setIsError(false)
-                    .addContent("Mock execution completed successfully")
+                    .addContent("Camel YAML route execution initiated successfully")
                     .setOutputType(OutputType.STDOUT)
                     .setStatus(ExecutionStatus.RUNNING)
                     .setTimestamp(System.currentTimeMillis())
                     .build());
 
+            // Completion notification
             responseObserver.onNext(CodeExecutionReply.newBuilder()
                     .setIsError(false)
                     .addContent("Execution finished")

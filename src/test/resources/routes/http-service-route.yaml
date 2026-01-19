@@ -1,0 +1,14 @@
+- beans:
+  - name: jsonProcessor
+    type: org.apache.camel.processor.json.JacksonTypeConverter
+
+- from:
+    uri: "platform-http:/api/greeting"
+    steps:
+      - setBody:
+          constant: "{\"greeting\":\"Hello, World!\",\"timestamp\":\"${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSXXX}\"}"
+      - setHeader:
+          name: "Content-Type"
+          constant: "application/json"
+      - log:
+          message: "HTTP request received, responding with: ${body}"

@@ -1,0 +1,28 @@
+- from:
+    uri: "file:input"
+    parameters:
+      noop: "true"
+      delay: "1000"
+    steps:
+      - log:
+          message: "Processing file: ${header.CamelFileName}"
+      - choice:
+          when:
+          - simple: "${header.CamelFileName} ends with '.txt'"
+            steps:
+            - log:
+                message: "Text file detected: ${header.CamelFileName}"
+            - to:
+                uri: "file:output/text"
+          - simple: "${header.CamelFileName} ends with '.xml'"
+            steps:
+            - log:
+                message: "XML file detected: ${header.CamelFileName}"
+            - to:
+                uri: "file:output/xml"
+          otherwise:
+            steps:
+              - log:
+                  message: "Unknown file type: ${header.CamelFileName}"
+              - to:
+                  uri: "file:output/unknown"

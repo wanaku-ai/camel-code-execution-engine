@@ -1,0 +1,26 @@
+- from:
+    uri: "direct:start"
+    errorHandler:
+      defaultErrorHandler:
+        maximumRedeliveries: "3"
+        redeliveryDelay: "1000"
+        backOffMultiplier: "2"
+        useExponentialBackOff: "true"
+    steps:
+      - log:
+          message: "Processing message: ${body}"
+      - process:
+          ref: "myProcessor"
+      - choice:
+          when:
+          - simple: "${body} contains 'error'"
+            steps:
+            - throwException:
+                exceptionType: "java.lang.IllegalArgumentException"
+                message: "Simulated error: ${body}"
+          otherwise:
+            steps:
+              - log:
+                  message: "Success: ${body}"
+              - to:
+                  uri: "mock:success"

@@ -1,0 +1,9 @@
+- from:
+    uri: "timer:simple"
+    parameters:
+      period: "2000"
+    steps:
+      - setBody:
+          constant: "Hello from Camel YAML Route!"
+      - log:
+          message: "Timer fired: ${body}"

@@ -1,0 +1,17 @@
+- from:
+    uri: "direct:start"
+    steps:
+      - log:
+          message: "Original message: ${body}"
+      - marshal:
+          json: {}
+      - log:
+          message: "Marshalled to JSON: ${body}"
+      - unmarshal:
+          json: {}
+      - transform:
+          simple: "${body.toUpperCase()}"
+      - log:
+          message: "Transformed message: ${body}"
+      - to:
+          uri: "mock:result"

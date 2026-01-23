@@ -7,19 +7,11 @@ import ai.wanaku.core.exchange.CodeExecutionRequest;
 import ai.wanaku.core.exchange.CodeExecutorGrpc;
 import ai.wanaku.core.exchange.ExecutionStatus;
 import ai.wanaku.core.exchange.OutputType;
-import ai.wanaku.core.exchange.ToolInvokeReply;
-import ai.wanaku.downloader.DownloaderFactory;
-import ai.wanaku.downloader.ResourceRefs;
-import ai.wanaku.downloader.ResourceType;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
@@ -122,7 +114,8 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
             try (ProducerTemplate producerTemplate = camelContext.createProducerTemplate()) {
                 final Object reply;
 
-                final String body = (request.getBody() == null || request.getBody().isEmpty()) ? "" : request.getBody();
+                final String body =
+                        (request.getBody() == null || request.getBody().isEmpty()) ? "" : request.getBody();
                 reply = producerTemplate.requestBody("direct:start", body);
 
                 responseObserver.onNext(CodeExecutionReply.newBuilder()

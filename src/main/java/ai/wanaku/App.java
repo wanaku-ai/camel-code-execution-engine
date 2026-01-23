@@ -18,6 +18,7 @@ import ai.wanaku.grpc.CodeExecutorService;
 import ai.wanaku.grpc.ProvisionBase;
 import ai.wanaku.init.Initializer;
 import ai.wanaku.init.InitializerFactory;
+import ai.wanaku.util.VersionHelper;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
@@ -33,50 +34,95 @@ import picocli.CommandLine;
 public class App implements Callable<Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display a help message")
+    @CommandLine.Option(
+            names = {"-h", "--help"},
+            usageHelp = true,
+            description = "display a help message")
     private boolean helpRequested = false;
 
-    @CommandLine.Option(names = {"--registration-url"}, description = "The registration URL to use", required = true)
+    @CommandLine.Option(
+            names = {"--registration-url"},
+            description = "The registration URL to use",
+            required = true)
     private String registrationUrl;
 
-    @CommandLine.Option(names = {"--grpc-port"}, description = "The gRPC port to use", defaultValue = "9190")
+    @CommandLine.Option(
+            names = {"--grpc-port"},
+            description = "The gRPC port to use",
+            defaultValue = "9190")
     private int grpcPort;
 
-    @CommandLine.Option(names = {"--registration-announce-address"}, description = "The announce address to use when registering",
-            defaultValue = "auto", required = true)
+    @CommandLine.Option(
+            names = {"--registration-announce-address"},
+            description = "The announce address to use when registering",
+            defaultValue = "auto",
+            required = true)
     private String registrationAnnounceAddress;
 
-    @CommandLine.Option(names = {"--name"}, description = "The service name to use", defaultValue = "code-execution-engine")
+    @CommandLine.Option(
+            names = {"--name"},
+            description = "The service name to use",
+            defaultValue = "code-execution-engine")
     private String name;
 
-    @CommandLine.Option(names = {"--retries"}, description = "The maximum number of retries for registration", defaultValue = "12")
+    @CommandLine.Option(
+            names = {"--retries"},
+            description = "The maximum number of retries for registration",
+            defaultValue = "12")
     private int retries;
 
-    @CommandLine.Option(names = {"--wait-seconds"}, description = "The retry wait seconds between attempts", defaultValue = "5")
+    @CommandLine.Option(
+            names = {"--wait-seconds"},
+            description = "The retry wait seconds between attempts",
+            defaultValue = "5")
     private int retryWaitSeconds;
 
-    @CommandLine.Option(names = {"--initial-delay"}, description = "Initial delay for registration attempts in seconds", defaultValue = "5")
+    @CommandLine.Option(
+            names = {"--initial-delay"},
+            description = "Initial delay for registration attempts in seconds",
+            defaultValue = "5")
     private long initialDelay;
 
-    @CommandLine.Option(names = {"--period"}, description = "Period between registration attempts in seconds", defaultValue = "5")
+    @CommandLine.Option(
+            names = {"--period"},
+            description = "Period between registration attempts in seconds",
+            defaultValue = "5")
     private long period;
 
-    @CommandLine.Option(names = {"--token-endpoint"}, description = "The base URL for the authentication", required = false)
+    @CommandLine.Option(
+            names = {"--token-endpoint"},
+            description = "The base URL for the authentication",
+            required = false)
     private String tokenEndpoint;
 
-    @CommandLine.Option(names = {"--client-id"}, description = "The client ID authentication", required = true)
+    @CommandLine.Option(
+            names = {"--client-id"},
+            description = "The client ID authentication",
+            required = true)
     private String clientId;
 
-    @CommandLine.Option(names = {"--client-secret"}, description = "The client secret authentication", required = true)
+    @CommandLine.Option(
+            names = {"--client-secret"},
+            description = "The client secret authentication",
+            required = true)
     private String clientSecret;
 
-    @CommandLine.Option(names = {"--data-dir"}, description = "The data directory to use", defaultValue = "/tmp/cee")
+    @CommandLine.Option(
+            names = {"--data-dir"},
+            description = "The data directory to use",
+            defaultValue = "/tmp/cee")
     private String dataDir;
 
-    @CommandLine.Option(names = {"--init-from"}, description = "Git repository URL to clone on startup", required = false)
+    @CommandLine.Option(
+            names = {"--init-from"},
+            description = "Git repository URL to clone on startup",
+            required = false)
     private String initFrom;
 
-    @CommandLine.Option(names = {"--repositories"}, description = "Maven repositories to use", required = false)
+    @CommandLine.Option(
+            names = {"--repositories"},
+            description = "Maven repositories to use",
+            required = false)
     private String repositories;
 
     public static void main(String[] args) {
@@ -87,7 +133,8 @@ public class App implements Callable<Integer> {
 
     private ServiceTarget newServiceTarget() {
         String address = DiscoveryHelper.resolveRegistrationAddress(registrationAnnounceAddress);
-        return ServiceTarget.newEmptyTarget(name, address, grpcPort, ServiceType.CODE_EXECUTION_ENGINE.asValue(), "camel", "yaml", null, null);
+        return ServiceTarget.newEmptyTarget(
+                name, address, grpcPort, ServiceType.CODE_EXECUTION_ENGINE.asValue(), "camel", "yaml", null, null);
     }
 
     public RegistrationManager newRegistrationManager(ServiceTarget serviceTarget, ServiceConfig serviceConfig) {
@@ -111,7 +158,7 @@ public class App implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        LOG.info("Code Execution Engine is starting");
+        LOG.info("Code Execution Engine {} is starting", VersionHelper.VERSION);
 
         // 1. Create the data directory first (needed by initializers and workspace)
         Path dataDirPath = Paths.get(dataDir);
@@ -140,7 +187,8 @@ public class App implements Callable<Integer> {
 
         try {
             // 6. Create and start gRPC server with CodeExecutorService
-            final ServerBuilder<?> serverBuilder = Grpc.newServerBuilderForPort(grpcPort, InsecureServerCredentials.create());
+            final ServerBuilder<?> serverBuilder =
+                    Grpc.newServerBuilderForPort(grpcPort, InsecureServerCredentials.create());
             final Server server = serverBuilder
                     .addService(new CodeExecutorService(servicesHttpClient, dataDirPath, repositories))
                     .addService(new ProvisionBase(name))

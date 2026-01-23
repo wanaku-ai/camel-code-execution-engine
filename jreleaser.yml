@@ -1,0 +1,41 @@
+project:
+  name: camel-code-execution-engine
+  description: Camel Code Execution Engine
+  longDescription: A gRPC-based code execution engine for Apache Camel routes, enabling dynamic route execution via remote procedure calls.
+
+  authors:
+    - The Wanaku Development Team
+  license: Apache-2.0
+  links:
+    homepage: https://wanaku.ai
+    bugTracker: https://github.com/wanaku-ai/camel-code-execution-engine/issues
+  languages:
+    java:
+      groupId: ai.wanaku
+      version: 21
+  inceptionYear: 2025
+  tags:
+    - 'camel'
+    - 'grpc'
+    - 'java'
+    - 'code-execution'
+    - 'dynamic-routes'
+
+signing:
+  active: ALWAYS
+
+release:
+  github:
+    owner: wanaku-ai
+    overwrite: false
+    issues:
+      enabled: true
+    update:
+      enabled: true
+    skipTag: true
+
+distributions:
+  camel-code-execution-engine:
+    artifacts:
+      - path: ./target/camel-code-execution-engine-app.jar
+    type: SINGLE_JAR

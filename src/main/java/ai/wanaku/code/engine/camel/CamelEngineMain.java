@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-public class App implements Callable<Integer> {
-    private static final Logger LOG = LoggerFactory.getLogger(App.class);
+public class CamelEngineMain implements Callable<Integer> {
+    private static final Logger LOG = LoggerFactory.getLogger(CamelEngineMain.class);
 
     @CommandLine.Option(
             names = {"-h", "--help"},
@@ -126,7 +126,7 @@ public class App implements Callable<Integer> {
     private String repositories;
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new App()).execute(args);
+        int exitCode = new CommandLine(new CamelEngineMain()).execute(args);
 
         System.exit(exitCode);
     }

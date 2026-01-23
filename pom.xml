@@ -17,7 +17,7 @@
         <wanaku.sdk.version>0.1.0-SNAPSHOT</wanaku.sdk.version>
         <camel.version>4.17.0</camel.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <project.main.class>ai.wanaku.code.engine.camel.App</project.main.class>
+        <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
         <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
     </properties>

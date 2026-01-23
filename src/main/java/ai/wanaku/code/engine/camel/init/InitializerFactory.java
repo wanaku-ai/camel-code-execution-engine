@@ -1,4 +1,4 @@
-package ai.wanaku.init;
+package ai.wanaku.code.engine.camel.init;
 
 import java.nio.file.Path;
 

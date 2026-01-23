@@ -1,4 +1,4 @@
-package ai.wanaku.downloader;
+package ai.wanaku.code.engine.camel.downloader;
 
 import ai.wanaku.capabilities.sdk.api.discovery.DiscoveryCallback;
 import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;

@@ -1,4 +1,4 @@
-package ai.wanaku;
+package ai.wanaku.code.engine.camel;
 
 import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;
 import ai.wanaku.capabilities.sdk.api.types.providers.ServiceTarget;
@@ -14,11 +14,11 @@ import ai.wanaku.capabilities.sdk.discovery.deserializer.JacksonDeserializer;
 import ai.wanaku.capabilities.sdk.discovery.util.DiscoveryHelper;
 import ai.wanaku.capabilities.sdk.security.TokenEndpoint;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.grpc.CodeExecutorService;
-import ai.wanaku.grpc.ProvisionBase;
-import ai.wanaku.init.Initializer;
-import ai.wanaku.init.InitializerFactory;
-import ai.wanaku.util.VersionHelper;
+import ai.wanaku.code.engine.camel.grpc.CodeExecutorService;
+import ai.wanaku.code.engine.camel.grpc.ProvisionBase;
+import ai.wanaku.code.engine.camel.init.Initializer;
+import ai.wanaku.code.engine.camel.init.InitializerFactory;
+import ai.wanaku.code.engine.camel.util.VersionHelper;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;

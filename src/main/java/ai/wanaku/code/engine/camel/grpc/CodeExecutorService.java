@@ -1,7 +1,7 @@
-package ai.wanaku.grpc;
+package ai.wanaku.code.engine.camel.grpc;
 
-import ai.wanaku.WanakuCamelManager;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.WanakuCamelManager;
 import ai.wanaku.core.exchange.CodeExecutionReply;
 import ai.wanaku.core.exchange.CodeExecutionRequest;
 import ai.wanaku.core.exchange.CodeExecutorGrpc;

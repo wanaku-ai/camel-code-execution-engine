@@ -1,4 +1,4 @@
-package ai.wanaku.downloader;
+package ai.wanaku.code.engine.camel.downloader;
 
 import ai.wanaku.capabilities.sdk.api.types.DataStore;
 import ai.wanaku.capabilities.sdk.api.types.WanakuResponse;

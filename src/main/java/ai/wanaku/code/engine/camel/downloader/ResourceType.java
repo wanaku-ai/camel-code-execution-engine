@@ -1,4 +1,4 @@
-package ai.wanaku.downloader;
+package ai.wanaku.code.engine.camel.downloader;
 
 public enum ResourceType {
     ROUTES_REF,

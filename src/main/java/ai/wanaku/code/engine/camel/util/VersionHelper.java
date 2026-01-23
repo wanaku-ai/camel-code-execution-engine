@@ -1,4 +1,4 @@
-package ai.wanaku.util;
+package ai.wanaku.code.engine.camel.util;
 
 import java.io.IOException;
 import java.io.InputStream;

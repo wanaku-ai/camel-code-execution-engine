@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ai.wanaku</groupId>
+    <groupId>ai.wanaku.code.engine.camel</groupId>
     <artifactId>camel-code-execution-engine</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
@@ -17,7 +17,7 @@
         <wanaku.sdk.version>0.1.0-SNAPSHOT</wanaku.sdk.version>
         <camel.version>4.17.0</camel.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <project.main.class>ai.wanaku.App</project.main.class>
+        <project.main.class>ai.wanaku.code.engine.camel.App</project.main.class>
         <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
     </properties>

@@ -1,4 +1,4 @@
-package ai.wanaku.downloader;
+package ai.wanaku.code.engine.camel.downloader;
 
 import java.net.URI;
 import java.nio.file.Path;

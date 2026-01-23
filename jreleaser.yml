@@ -11,7 +11,7 @@ project:
     bugTracker: https://github.com/wanaku-ai/camel-code-execution-engine/issues
   languages:
     java:
-      groupId: ai.wanaku
+      groupId: ai.wanaku.code.engine.camel
       version: 21
   inceptionYear: 2025
   tags:

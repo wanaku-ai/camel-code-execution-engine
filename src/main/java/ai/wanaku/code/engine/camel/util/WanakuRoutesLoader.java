@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package ai.wanaku.util;
+package ai.wanaku.code.engine.camel.util;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ExtendedCamelContext;

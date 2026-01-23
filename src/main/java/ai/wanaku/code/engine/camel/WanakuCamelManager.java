@@ -1,7 +1,7 @@
-package ai.wanaku;
+package ai.wanaku.code.engine.camel;
 
-import ai.wanaku.downloader.ResourceType;
-import ai.wanaku.util.WanakuRoutesLoader;
+import ai.wanaku.code.engine.camel.downloader.ResourceType;
+import ai.wanaku.code.engine.camel.util.WanakuRoutesLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

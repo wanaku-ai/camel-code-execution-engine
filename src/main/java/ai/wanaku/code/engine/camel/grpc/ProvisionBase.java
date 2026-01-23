@@ -1,4 +1,4 @@
-package ai.wanaku.grpc;
+package ai.wanaku.code.engine.camel.grpc;
 
 import ai.wanaku.capabilities.sdk.config.provider.api.ConfigProvisioner;
 import ai.wanaku.capabilities.sdk.config.provider.api.ProvisionedConfig;

@@ -17,6 +17,9 @@
         <wanaku.sdk.version>0.1.0-SNAPSHOT</wanaku.sdk.version>
         <camel.version>4.17.0</camel.version>
         <snakeyaml.version>2.0</snakeyaml.version>
+        <project.main.class>ai.wanaku.App</project.main.class>
+        <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
+        <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -137,29 +140,100 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.camel</groupId>
+                    <artifactId>camel-maven-plugin</artifactId>
+                    <version>${camel.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-fatjar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <archive>
+                            <manifest>
+                                <mainClass>${project.main.class}</mainClass>
+                            </manifest>
+                        </archive>
+                        <finalName>camel-code-execution-engine-app</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless-maven-plugin.version}</version>
+                    <configuration>
+                        <java>
+                            <palantirJavaFormat>
+                                <version>2.71.0</version>
+                            </palantirJavaFormat>
+                            <removeUnusedImports />
+                            <formatAnnotations />
+                        </java>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>apply</goal>
+                            </goals>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>${maven-assembly-plugin.version}</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>ai.wanaku.App</mainClass>
-                        </manifest>
-                    </archive>
-                    <finalName>camel-code-execution-engine-app</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -34,7 +34,8 @@ public class ProvisionBase extends ProvisionerGrpc.ProvisionerImplBase {
     }
 
     public Map<String, PropertySchema> properties() {
-        // Use this to push any server-side properties/arguments. Use the toPropertySchema to serialize their additional details
+        // Use this to push any server-side properties/arguments. Use the toPropertySchema to serialize their additional
+        // details
         // Map.of("argument-name", toPropertySchema("The description for what argument-name is", "string", true));
         return Map.of();
     }

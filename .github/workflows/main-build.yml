@@ -1,0 +1,78 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+name: Build Main
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+        - main
+    tags:
+      - v*
+    paths-ignore:
+      - .github/**
+      - docs/**
+      - README.md
+      - LICENSE
+
+env:
+  PROJECTS: ${{ github.workspace }}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+    - name: Checkout and build dependencies
+      run: |
+        cd ..
+        git clone https://github.com/wanaku-ai/wanaku-capabilities-java-sdk.git
+        cd wanaku-capabilities-java-sdk
+        mvn -DskipTests -DskipTests -B install --file pom.xml
+        cd ${{ github.workspace }}
+    - name: Build with Maven
+      run: mvn -B clean package --file pom.xml
+    - name: Set arch
+      id: arch
+      run: echo "arch=$(uname -m)" >> $GITHUB_OUTPUT
+    - name: Login to Container Registry
+      if: github.repository == 'wanaku-ai/camel-code-execution-engine'
+      uses: docker/login-action@v3
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+    - name: Build containers
+      if: github.repository == 'wanaku-ai/camel-code-execution-engine'
+      run: podman build -t quay.io/wanaku/camel-code-execution-engine:${{ github.ref_name }}-${{ steps.arch.outputs.arch }} .
+    - name: Push containers
+      if: github.repository == 'wanaku-ai/camel-code-execution-engine'
+      run: podman push quay.io/wanaku/camel-code-execution-engine:${{ github.ref_name }}-${{ steps.arch.outputs.arch }}
+
+  createManifests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Container Registry
+        if: github.repository == 'wanaku-ai/camel-code-execution-engine'
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+      - name: Build and Push Manifests
+        run: |
+          chmod +x build-manifests.sh
+          ./build-manifests.sh ${{ github.ref_name }}

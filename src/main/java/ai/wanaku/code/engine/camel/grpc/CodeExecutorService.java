@@ -124,8 +124,6 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                         .build());
             } catch (Exception e) {
                 reportRouteFailure(responseObserver, e, "direct:start");
-            } finally {
-                responseObserver.onCompleted();
             }
 
             // 6. Stream execution status - the routes are already running in the CamelContext

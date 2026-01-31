@@ -34,7 +34,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
     public void executeCode(CodeExecutionRequest request, StreamObserver<CodeExecutionReply> responseObserver) {
         LOG.info("Received code execution request for URI: {}", request.getUri());
         LOG.info(
-                "Received code ({} bytes - showing first 500 bytes): {}", request.getCode().length(),
+                "Received code ({} bytes - showing first 500 bytes):\n{}", request.getCode().length(),
                 request.getCode());
 
         Path workspace = null;

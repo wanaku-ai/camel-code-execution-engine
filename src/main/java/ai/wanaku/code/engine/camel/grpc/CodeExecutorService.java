@@ -33,7 +33,9 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
     @Override
     public void executeCode(CodeExecutionRequest request, StreamObserver<CodeExecutionReply> responseObserver) {
         LOG.info("Received code execution request for URI: {}", request.getUri());
-        LOG.info("Received code to execute: {}", request.getCode());
+        LOG.info(
+                "Received code ({} bytes - showing first 500 bytes): {}", request.getCode().length(),
+                request.getCode());
 
         Path workspace = null;
         WanakuCamelManager camelManager = null;
@@ -45,7 +47,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                     .setIsError(false)
                     .addContent("Creating workspace")
                     .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.RUNNING)
+                    .setStatus(ExecutionStatus.PENDING)
                     .setTimestamp(timestamp)
                     .build());
 
@@ -54,7 +56,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
             if (code == null || code.trim().isEmpty()) {
                 throw new IllegalArgumentException("Request code is empty or null");
             }
-            LOG.info("Received code ({} bytes): {}", code.length(), code.substring(0, Math.min(200, code.length())));
+
 
             // 1. Create temp workspace
             if (!Files.exists(dataDir)) {
@@ -78,7 +80,7 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                     .setIsError(false)
                     .addContent("Routes written to workspace")
                     .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.RUNNING)
+                    .setStatus(ExecutionStatus.PENDING)
                     .setTimestamp(System.currentTimeMillis())
                     .build());
 
@@ -99,54 +101,57 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                     .setTimestamp(System.currentTimeMillis())
                     .build());
 
+            LOG.info("Starting Camel Context");
             camelManager = new WanakuCamelManager(routesPath, dependenciesList, repositoriesList);
             LOG.info("CamelContext started with routes");
 
             responseObserver.onNext(CodeExecutionReply.newBuilder()
                     .setIsError(false)
                     .addContent("Camel routes loaded and context started")
-                    .setOutputType(OutputType.STDOUT)
+                    .setOutputType(OutputType.STATUS)
+                    .setStatus(ExecutionStatus.RUNNING)
+                    .setTimestamp(System.currentTimeMillis())
+                    .build());
+
+            // 6. Stream execution status - the routes are already running in the CamelContext
+            responseObserver.onNext(CodeExecutionReply.newBuilder()
+                    .setIsError(false)
+                    .addContent("Routes are now executing")
+                    .setOutputType(OutputType.STATUS)
                     .setStatus(ExecutionStatus.RUNNING)
                     .setTimestamp(System.currentTimeMillis())
                     .build());
 
             final CamelContext camelContext = camelManager.getCamelContext();
             try (ProducerTemplate producerTemplate = camelContext.createProducerTemplate()) {
-                final Object reply;
 
                 final String body =
                         (request.getBody() == null || request.getBody().isEmpty()) ? "" : request.getBody();
-                reply = producerTemplate.requestBody("direct:start", body);
+                final String reply = producerTemplate.requestBody("direct:start", body, String.class);
 
                 responseObserver.onNext(CodeExecutionReply.newBuilder()
                         .setIsError(false)
-                        .addAllContent(List.of(reply.toString()))
+                        .setOutputType(OutputType.STDOUT)
+                        .setStatus(ExecutionStatus.COMPLETED)
+                        .addContent(reply.toString())
                         .build());
+
+                // 8. Send completion status
+                responseObserver.onNext(CodeExecutionReply.newBuilder()
+                        .setIsError(false)
+                        .addContent("Execution completed successfully")
+                        .setOutputType(OutputType.COMPLETION)
+                        .setStatus(ExecutionStatus.COMPLETED)
+                        .setExitCode(0)
+                        .setTimestamp(System.currentTimeMillis())
+                        .build());
+
+                responseObserver.onCompleted();
+                LOG.info("Code execution completed for URI: {}", request.getUri());
             } catch (Exception e) {
                 reportRouteFailure(responseObserver, e, "direct:start");
+                responseObserver.onCompleted();
             }
-
-            // 6. Stream execution status - the routes are already running in the CamelContext
-            responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
-                    .addContent("Routes are now executing")
-                    .setOutputType(OutputType.STDOUT)
-                    .setStatus(ExecutionStatus.RUNNING)
-                    .setTimestamp(System.currentTimeMillis())
-                    .build());
-
-            // 8. Send completion status
-            responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
-                    .addContent("Execution completed successfully")
-                    .setOutputType(OutputType.COMPLETION)
-                    .setStatus(ExecutionStatus.COMPLETED)
-                    .setExitCode(0)
-                    .setTimestamp(System.currentTimeMillis())
-                    .build());
-
-            responseObserver.onCompleted();
-            LOG.info("Code execution completed for URI: {}", request.getUri());
 
         } catch (Exception e) {
             LOG.error("Error during code execution", e);
@@ -206,8 +211,14 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         }
 
         responseObserver.onNext(CodeExecutionReply.newBuilder()
-                .setIsError(true)
-                .addAllContent(List.of(String.format("Unable to invoke tool: %s", e.getMessage())))
-                .build());
+                        .setIsError(true)
+                        .addContent(String.format("Unable to invoke tool: %s", e.getMessage()))
+                        .setExitCode(2)
+                        .setTimestamp(System.currentTimeMillis())
+                        .setOutputType(OutputType.STDERR)
+                        .setStatus(ExecutionStatus.FAILED)
+                                .build());
+
+
     }
 }

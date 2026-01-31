@@ -54,7 +54,7 @@ public class WanakuRoutesLoader {
         this.downloader = createDownloader(cl);
     }
 
-    public void loadRoute(CamelContext context, String path) {
+    public void loadRoute(CamelContext context, String path) throws Exception {
         final ExtendedCamelContext camelContextExtension = context.getCamelContextExtension();
 
         try {
@@ -82,12 +82,7 @@ public class WanakuRoutesLoader {
         final ResourceLoader resourceLoader = PluginHelper.getResourceLoader(context);
         final Resource resource = resourceLoader.resolveResource(path);
 
-        try {
-            loader.loadRoutes(resource);
-        } catch (Exception e) {
-            LOG.error("Failed to load routes from {}", path, e);
-            return;
-        }
+        loader.loadRoutes(resource);
 
         context.build();
     }

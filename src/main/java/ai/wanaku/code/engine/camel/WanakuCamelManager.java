@@ -15,7 +15,7 @@ public class WanakuCamelManager {
     private final String dependenciesList;
     private final String repositoriesList;
 
-    public WanakuCamelManager(Map<ResourceType, Path> downloadedResources, String repositoriesList) {
+    public WanakuCamelManager(Map<ResourceType, Path> downloadedResources, String repositoriesList) throws Exception {
         this.repositoriesList = repositoriesList;
         context = new DefaultCamelContext();
 
@@ -35,7 +35,7 @@ public class WanakuCamelManager {
         loadRoutes();
     }
 
-    public WanakuCamelManager(Path routesPath, String dependenciesList, String repositoriesList) {
+    public WanakuCamelManager(Path routesPath, String dependenciesList, String repositoriesList) throws Exception {
         this.context = new DefaultCamelContext();
         this.routesPath = routesPath.toString();
         this.dependenciesList = dependenciesList;
@@ -43,7 +43,7 @@ public class WanakuCamelManager {
         loadRoutes();
     }
 
-    private void loadRoutes() {
+    private void loadRoutes() throws Exception {
         WanakuRoutesLoader routesLoader = new WanakuRoutesLoader(dependenciesList, repositoriesList);
 
         String routeFileUrl = String.format("file://%s", routesPath);

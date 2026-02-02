@@ -31,9 +31,6 @@ public class CodeGenToolRegistrar {
     /** The type identifier for code generation tools. */
     public static final String TOOL_TYPE = "codegen";
 
-    /** The namespace for code generation tools. */
-    public static final String TOOL_NAMESPACE = "ai.wanaku.codegen";
-
     private final ServicesHttpClient servicesHttpClient;
     private final CodeGenResourceLoader resourceLoader;
     private final List<ToolReference> registeredTools;
@@ -124,7 +121,6 @@ public class CodeGenToolRegistrar {
         ref.setDescription(tool.getDescription());
         ref.setUri(tool.getUri());
         ref.setType(TOOL_TYPE);
-        ref.setNamespace(TOOL_NAMESPACE);
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();
@@ -142,7 +138,6 @@ public class CodeGenToolRegistrar {
         ref.setDescription(tool.getDescription());
         ref.setUri(tool.getUri());
         ref.setType(TOOL_TYPE);
-        ref.setNamespace(TOOL_NAMESPACE);
 
         // Input schema with 'name' parameter
         InputSchema schema = new InputSchema();
@@ -167,7 +162,6 @@ public class CodeGenToolRegistrar {
         ref.setDescription(tool.getDescription());
         ref.setUri(tool.getUri());
         ref.setType(TOOL_TYPE);
-        ref.setNamespace(TOOL_NAMESPACE);
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();

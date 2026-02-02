@@ -1,0 +1,27 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: kafka-sink
+  labels:
+    camel.apache.org/kamelet.type: sink
+spec:
+  definition:
+    title: Kafka Sink
+    description: Sends messages to a Kafka topic
+    properties:
+      bootstrapServers:
+        title: Bootstrap Servers
+        description: Kafka bootstrap servers
+        type: string
+      topic:
+        title: Topic
+        description: The Kafka topic name
+        type: string
+  template:
+    from:
+      uri: "kamelet:source"
+      steps:
+        - to:
+            uri: "kafka:{{topic}}"
+            parameters:
+              brokers: "{{bootstrapServers}}"

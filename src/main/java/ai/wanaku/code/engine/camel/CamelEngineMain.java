@@ -14,6 +14,12 @@ import ai.wanaku.capabilities.sdk.discovery.deserializer.JacksonDeserializer;
 import ai.wanaku.capabilities.sdk.discovery.util.DiscoveryHelper;
 import ai.wanaku.capabilities.sdk.security.TokenEndpoint;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.codegen.CodeGenResourceLoader;
+import ai.wanaku.code.engine.camel.codegen.CodeGenToolRegistrar;
+import ai.wanaku.code.engine.camel.codegen.CodeGenToolService;
+import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
+import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
+import ai.wanaku.code.engine.camel.downloader.ResourceType;
 import ai.wanaku.code.engine.camel.grpc.CodeExecutorService;
 import ai.wanaku.code.engine.camel.grpc.ProvisionBase;
 import ai.wanaku.code.engine.camel.init.Initializer;
@@ -23,9 +29,12 @@ import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +134,12 @@ public class CamelEngineMain implements Callable<Integer> {
             required = false)
     private String repositories;
 
+    @CommandLine.Option(
+            names = {"--codegen-package"},
+            description = "URI of the code generation package (e.g., datastore-archive://code-gen-package.tar.bz2)",
+            required = false)
+    private String codegenPackage;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new CamelEngineMain()).execute(args);
 
@@ -185,8 +200,26 @@ public class CamelEngineMain implements Callable<Integer> {
         final ServiceTarget serviceTarget = newServiceTarget();
         RegistrationManager registrationManager = newRegistrationManager(serviceTarget, serviceConfig);
 
+        // 6. Initialize code generation tools if package is specified
+        CodeGenToolService codeGenToolService = null;
+        CodeGenToolRegistrar codeGenToolRegistrar = null;
+
+        if (codegenPackage != null && !codegenPackage.isEmpty()) {
+            try {
+                codeGenToolService = initializeCodeGenTools(servicesHttpClient, dataDirPath);
+                if (codeGenToolService != null && codeGenToolService.isReady()) {
+                    CodeGenResourceLoader resourceLoader =
+                            CodeGenResourceLoader.load(getCodeGenPackagePath(dataDirPath));
+                    codeGenToolRegistrar = new CodeGenToolRegistrar(servicesHttpClient, resourceLoader, name);
+                    codeGenToolRegistrar.registerTools();
+                }
+            } catch (Exception e) {
+                LOG.warn("Failed to initialize code generation tools: {}. Continuing without them.", e.getMessage());
+            }
+        }
+
         try {
-            // 6. Create and start gRPC server with CodeExecutorService
+            // 7. Create and start gRPC server with CodeExecutorService
             final ServerBuilder<?> serverBuilder =
                     Grpc.newServerBuilderForPort(grpcPort, InsecureServerCredentials.create());
             final Server server = serverBuilder
@@ -199,9 +232,72 @@ public class CamelEngineMain implements Callable<Integer> {
             LOG.info("Code Execution Engine started successfully");
             server.awaitTermination();
         } finally {
+            if (codeGenToolRegistrar != null) {
+                codeGenToolRegistrar.deregisterTools();
+            }
             registrationManager.deregister();
         }
 
         return 0;
+    }
+
+    /**
+     * Initializes code generation tools by downloading and extracting the package.
+     *
+     * @param servicesHttpClient the HTTP client for downloading
+     * @param dataDirPath the data directory path
+     * @return the initialized CodeGenToolService, or null if initialization fails
+     */
+    private CodeGenToolService initializeCodeGenTools(ServicesHttpClient servicesHttpClient, Path dataDirPath) {
+        LOG.info("Initializing code generation tools from: {}", codegenPackage);
+
+        try {
+            DownloaderFactory downloaderFactory = new DownloaderFactory(servicesHttpClient, dataDirPath);
+
+            // Download and extract the package
+            URI packageUri = URI.create(codegenPackage);
+            ResourceRefs<URI> resourceRef = new ResourceRefs<>(ResourceType.CODEGEN_PACKAGE, packageUri);
+            Map<ResourceType, Path> downloadedResources = new HashMap<>();
+
+            downloaderFactory.getDownloader(packageUri).downloadResource(resourceRef, downloadedResources);
+
+            Path packagePath = downloadedResources.get(ResourceType.CODEGEN_PACKAGE);
+            if (packagePath == null) {
+                LOG.warn("Code generation package download failed");
+                return CodeGenToolService.unready();
+            }
+
+            // Load resources and create service
+            CodeGenResourceLoader resourceLoader = CodeGenResourceLoader.load(packagePath);
+            CodeGenToolService service = new CodeGenToolService(resourceLoader);
+
+            LOG.info("Code generation tools initialized successfully");
+            return service;
+
+        } catch (Exception e) {
+            LOG.warn("Failed to initialize code generation tools: {}", e.getMessage(), e);
+            return CodeGenToolService.unready();
+        }
+    }
+
+    /**
+     * Returns the path where the code generation package is extracted.
+     *
+     * @param dataDirPath the data directory path
+     * @return the package extraction path
+     */
+    private Path getCodeGenPackagePath(Path dataDirPath) {
+        if (codegenPackage == null) {
+            return null;
+        }
+        URI packageUri = URI.create(codegenPackage);
+        String fileName = packageUri.getHost();
+        // Remove archive extensions
+        if (fileName.endsWith(".tar.bz2")) {
+            fileName = fileName.substring(0, fileName.length() - 8);
+        } else if (fileName.endsWith(".tar.bz")) {
+            fileName = fileName.substring(0, fileName.length() - 7);
+        }
+        return dataDirPath.resolve(fileName);
     }
 }

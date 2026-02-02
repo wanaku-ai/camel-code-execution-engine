@@ -17,7 +17,8 @@ ENV REGISTRATION_URL="" \
     CLIENT_SECRET="" \
     INIT_FROM="" \
     REPOSITORIES="" \
-    DATA_DIR="/data"
+    DATA_DIR="/data" \
+    CODEGEN_PACKAGE=""
 
 # Create and declare volume for execution data
 VOLUME /data
@@ -39,4 +40,5 @@ ENTRYPOINT ["sh", "-c", "java -jar /app/app.jar \
     ${CLIENT_SECRET:+--client-secret $CLIENT_SECRET} \
     ${INIT_FROM:+--init-from $INIT_FROM} \
     ${REPOSITORIES:+--repositories $REPOSITORIES} \
-    ${DATA_DIR:+--data-dir $DATA_DIR}"]
+    ${DATA_DIR:+--data-dir $DATA_DIR} \
+    ${CODEGEN_PACKAGE:+--codegen-package $CODEGEN_PACKAGE}"]

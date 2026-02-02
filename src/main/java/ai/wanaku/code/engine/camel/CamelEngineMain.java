@@ -130,7 +130,8 @@ public class CamelEngineMain implements Callable<Integer> {
 
     @CommandLine.Option(
             names = {"--codegen-package"},
-            description = "URI of the code generation package (e.g., datastore-archive://code-gen-package.tar.bz2)",
+            description = "Code generation package location. Can be a local directory path or a URI "
+                    + "(e.g., /path/to/package or datastore-archive://code-gen-package.tar.bz2)",
             required = true)
     private String codegenPackage;
 

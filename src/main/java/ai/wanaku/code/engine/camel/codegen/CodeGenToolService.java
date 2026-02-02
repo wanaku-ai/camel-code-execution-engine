@@ -12,13 +12,10 @@ import org.slf4j.LoggerFactory;
  * Service that handles code generation tool invocations.
  *
  * <p>This service routes tool invocation requests to the appropriate handler based on the
- * URI scheme (codegen://{toolName}) and returns the tool execution results.
+ * tool name extracted from the URI ({scheme}://{toolName}).
  */
 public class CodeGenToolService {
     private static final Logger LOG = LoggerFactory.getLogger(CodeGenToolService.class);
-
-    /** The URI scheme for code generation tools. */
-    public static final String SCHEME = "codegen";
 
     private final SearchServicesTool searchServicesTool;
     private final ReadKameletTool readKameletTool;
@@ -69,7 +66,11 @@ public class CodeGenToolService {
     /**
      * Invokes a tool based on the provided URI and arguments.
      *
-     * @param uri the tool URI (e.g., codegen://searchServicesTool)
+     * <p>The tool is identified by the host/authority part of the URI, regardless of the scheme.
+     * For example, both "codegen://searchServicesTool" and "myservice://searchServicesTool"
+     * will invoke the searchServicesTool.
+     *
+     * @param uri the tool URI (e.g., myservice://searchServicesTool)
      * @param arguments the tool arguments (may be empty or null)
      * @return the tool execution result
      * @throws IllegalStateException if the service is not ready
@@ -84,12 +85,6 @@ public class CodeGenToolService {
         }
 
         URI toolUri = URI.create(uri);
-        String scheme = toolUri.getScheme();
-
-        if (!SCHEME.equals(scheme)) {
-            return ToolResult.error("Unknown URI scheme: " + scheme + ". Expected: " + SCHEME);
-        }
-
         String toolName = toolUri.getHost();
         if (toolName == null) {
             toolName = toolUri.getAuthority();

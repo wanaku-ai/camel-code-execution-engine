@@ -17,9 +17,6 @@ public class GenerateOrchestrationTool {
     /** The name of this tool as registered with Wanaku. */
     public static final String TOOL_NAME = "generateOrchestrationCode";
 
-    /** The URI scheme for this tool. */
-    public static final String TOOL_URI = "codegen://generateOrchestrationCode";
-
     /** The description for this tool. */
     public static final String TOOL_DESCRIPTION = "Returns the orchestration template for code generation";
 
@@ -71,15 +68,6 @@ public class GenerateOrchestrationTool {
      */
     public String getName() {
         return TOOL_NAME;
-    }
-
-    /**
-     * Returns the tool URI.
-     *
-     * @return the tool URI
-     */
-    public String getUri() {
-        return TOOL_URI;
     }
 
     /**

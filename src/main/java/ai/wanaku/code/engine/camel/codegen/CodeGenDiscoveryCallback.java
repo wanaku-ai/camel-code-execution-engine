@@ -8,7 +8,9 @@ import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
 import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
 import ai.wanaku.code.engine.camel.downloader.ResourceType;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -67,17 +69,9 @@ public class CodeGenDiscoveryCallback implements DiscoveryCallback {
         try {
             LOG.info("Initializing code generation tools from: {}", codegenPackageUri);
 
-            DownloaderFactory downloaderFactory = new DownloaderFactory(servicesHttpClient, dataDirPath);
-
-            URI packageUri = URI.create(codegenPackageUri);
-            ResourceRefs<URI> resourceRef = new ResourceRefs<>(ResourceType.CODEGEN_PACKAGE, packageUri);
-            Map<ResourceType, Path> downloadedResources = new HashMap<>();
-
-            downloaderFactory.getDownloader(packageUri).downloadResource(resourceRef, downloadedResources);
-
-            packagePath = downloadedResources.get(ResourceType.CODEGEN_PACKAGE);
+            packagePath = resolvePackagePath();
             if (packagePath == null) {
-                LOG.error("Code generation package download failed");
+                LOG.error("Code generation package could not be resolved");
                 toolService = CodeGenToolService.unready();
                 return;
             }
@@ -94,6 +88,81 @@ public class CodeGenDiscoveryCallback implements DiscoveryCallback {
             toolService = CodeGenToolService.unready();
         } finally {
             initLatch.countDown();
+        }
+    }
+
+    /**
+     * Resolves the package path from the configured URI or local directory.
+     *
+     * <p>If the input is a local directory path that exists, it is used directly.
+     * Otherwise, it is treated as a URI and downloaded from the data store.
+     *
+     * @return the resolved package path, or null if resolution failed
+     */
+    private Path resolvePackagePath() {
+        // Check if it's a local directory path
+        Path localPath = Paths.get(codegenPackageUri);
+        if (Files.isDirectory(localPath)) {
+            LOG.info("Using local directory for code generation package: {}", localPath);
+            return validateLocalPackage(localPath);
+        }
+
+        // Otherwise, treat as URI and download
+        return downloadPackage();
+    }
+
+    /**
+     * Validates that a local directory has the expected package structure.
+     *
+     * @param localPath the local directory path
+     * @return the path if valid, or null if validation fails
+     */
+    private Path validateLocalPackage(Path localPath) {
+        Path configFile = localPath.resolve("config.properties");
+        if (!Files.exists(configFile)) {
+            LOG.error("Local package missing required config.properties: {}", localPath);
+            return null;
+        }
+
+        Path kameletsDir = localPath.resolve("kamelets");
+        if (!Files.isDirectory(kameletsDir)) {
+            LOG.error("Local package missing required kamelets directory: {}", localPath);
+            return null;
+        }
+
+        Path templatesDir = localPath.resolve("templates");
+        if (!Files.isDirectory(templatesDir)) {
+            LOG.error("Local package missing required templates directory: {}", localPath);
+            return null;
+        }
+
+        LOG.debug("Local package structure validated: {}", localPath);
+        return localPath;
+    }
+
+    /**
+     * Downloads and extracts the package from the configured URI.
+     *
+     * @return the extracted package path, or null if download failed
+     */
+    private Path downloadPackage() {
+        try {
+            DownloaderFactory downloaderFactory = new DownloaderFactory(servicesHttpClient, dataDirPath);
+
+            URI packageUri = URI.create(codegenPackageUri);
+            ResourceRefs<URI> resourceRef = new ResourceRefs<>(ResourceType.CODEGEN_PACKAGE, packageUri);
+            Map<ResourceType, Path> downloadedResources = new HashMap<>();
+
+            downloaderFactory.getDownloader(packageUri).downloadResource(resourceRef, downloadedResources);
+
+            Path downloaded = downloadedResources.get(ResourceType.CODEGEN_PACKAGE);
+            if (downloaded == null) {
+                LOG.error("Code generation package download failed");
+            }
+            return downloaded;
+        } catch (Exception e) {
+            LOG.error("Failed to download code generation package: {}", e.getMessage(), e);
+            return null;
         }
     }
 

@@ -77,13 +77,6 @@ class GenerateOrchestrationToolTest {
     }
 
     @Test
-    void getUriReturnsToolUri() {
-        GenerateOrchestrationTool tool = new GenerateOrchestrationTool(resourceLoader);
-
-        assertEquals("codegen://generateOrchestrationCode", tool.getUri());
-    }
-
-    @Test
     void isTemplateAvailableReturnsTrue() {
         GenerateOrchestrationTool tool = new GenerateOrchestrationTool(resourceLoader);
 

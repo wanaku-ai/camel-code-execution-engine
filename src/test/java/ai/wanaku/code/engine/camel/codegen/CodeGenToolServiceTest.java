@@ -111,11 +111,12 @@ class CodeGenToolServiceTest {
     }
 
     @Test
-    void invokeWithWrongScheme() throws Exception {
-        CodeGenToolService.ToolResult result = service.invokeTool("wrongscheme://searchServicesTool", null);
+    void invokeWithDifferentScheme() throws Exception {
+        // Tool should work with any scheme - matching is done by tool name
+        CodeGenToolService.ToolResult result = service.invokeTool("myservice://searchServicesTool", null);
 
-        assertTrue(result.isError());
-        assertTrue(result.getError().contains("Unknown URI scheme"));
+        assertFalse(result.isError());
+        assertTrue(result.getContent().contains("kamelet:test-service"));
     }
 
     @Test

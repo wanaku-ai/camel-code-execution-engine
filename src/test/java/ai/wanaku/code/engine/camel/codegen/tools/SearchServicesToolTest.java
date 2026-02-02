@@ -76,13 +76,6 @@ class SearchServicesToolTest {
     }
 
     @Test
-    void getUriReturnsToolUri() {
-        SearchServicesTool tool = new SearchServicesTool(resourceLoader);
-
-        assertEquals("codegen://searchServicesTool", tool.getUri());
-    }
-
-    @Test
     void executeWithEmptyServicesReturnsNoServicesMessage() throws IOException {
         Path emptyPackage = tempDir.resolve("empty-package");
         Files.createDirectories(emptyPackage.resolve("kamelets"));

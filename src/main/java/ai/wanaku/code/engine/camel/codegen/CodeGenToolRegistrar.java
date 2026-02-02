@@ -28,9 +28,6 @@ import org.slf4j.LoggerFactory;
 public class CodeGenToolRegistrar {
     private static final Logger LOG = LoggerFactory.getLogger(CodeGenToolRegistrar.class);
 
-    /** The type identifier for code generation tools. */
-    public static final String TOOL_TYPE = "codegen";
-
     private final ServicesHttpClient servicesHttpClient;
     private final CodeGenResourceLoader resourceLoader;
     private final List<ToolReference> registeredTools;
@@ -115,12 +112,22 @@ public class CodeGenToolRegistrar {
         return Collections.unmodifiableList(registeredTools);
     }
 
+    /**
+     * Builds a tool URI using the service name as the scheme.
+     *
+     * @param toolName the tool name
+     * @return the full tool URI (e.g., "myservice://toolName")
+     */
+    private String buildToolUri(String toolName) {
+        return serviceName + "://" + toolName;
+    }
+
     private ToolReference createSearchServicesToolReference(SearchServicesTool tool) {
         ToolReference ref = new ToolReference();
         ref.setName(tool.getName());
         ref.setDescription(tool.getDescription());
-        ref.setUri(tool.getUri());
-        ref.setType(TOOL_TYPE);
+        ref.setUri(buildToolUri(tool.getName()));
+        ref.setType(serviceName);
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();
@@ -136,8 +143,8 @@ public class CodeGenToolRegistrar {
         ToolReference ref = new ToolReference();
         ref.setName(tool.getName());
         ref.setDescription(tool.getDescription());
-        ref.setUri(tool.getUri());
-        ref.setType(TOOL_TYPE);
+        ref.setUri(buildToolUri(tool.getName()));
+        ref.setType(serviceName);
 
         // Input schema with 'name' parameter
         InputSchema schema = new InputSchema();
@@ -160,8 +167,8 @@ public class CodeGenToolRegistrar {
         ToolReference ref = new ToolReference();
         ref.setName(tool.getName());
         ref.setDescription(tool.getDescription());
-        ref.setUri(tool.getUri());
-        ref.setType(TOOL_TYPE);
+        ref.setUri(buildToolUri(tool.getName()));
+        ref.setType(serviceName);
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();

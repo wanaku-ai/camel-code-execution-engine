@@ -18,9 +18,6 @@ public class SearchServicesTool {
     /** The name of this tool as registered with Wanaku. */
     public static final String TOOL_NAME = "searchServicesTool";
 
-    /** The URI scheme for this tool. */
-    public static final String TOOL_URI = "codegen://searchServicesTool";
-
     /**
      * Context template for formatting the services list.
      * The %s placeholder is replaced with the list of available services.
@@ -83,15 +80,6 @@ public class SearchServicesTool {
      */
     public String getName() {
         return TOOL_NAME;
-    }
-
-    /**
-     * Returns the tool URI.
-     *
-     * @return the tool URI
-     */
-    public String getUri() {
-        return TOOL_URI;
     }
 
     private String formatServicesList(List<String> services) {

@@ -102,13 +102,6 @@ class ReadKameletToolTest {
     }
 
     @Test
-    void getUriReturnsToolUri() {
-        ReadKameletTool tool = new ReadKameletTool(resourceLoader);
-
-        assertEquals("codegen://readKamelet", tool.getUri());
-    }
-
-    @Test
     void getAvailableKamelets() {
         ReadKameletTool tool = new ReadKameletTool(resourceLoader);
 

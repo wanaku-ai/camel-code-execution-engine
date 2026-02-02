@@ -14,13 +14,10 @@ import ai.wanaku.capabilities.sdk.discovery.deserializer.JacksonDeserializer;
 import ai.wanaku.capabilities.sdk.discovery.util.DiscoveryHelper;
 import ai.wanaku.capabilities.sdk.security.TokenEndpoint;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.codegen.CodeGenResourceLoader;
-import ai.wanaku.code.engine.camel.codegen.CodeGenToolRegistrar;
+import ai.wanaku.code.engine.camel.codegen.CodeGenDiscoveryCallback;
 import ai.wanaku.code.engine.camel.codegen.CodeGenToolService;
-import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
-import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
-import ai.wanaku.code.engine.camel.downloader.ResourceType;
 import ai.wanaku.code.engine.camel.grpc.CodeExecutorService;
+import ai.wanaku.code.engine.camel.grpc.CodeGenToolInvokerService;
 import ai.wanaku.code.engine.camel.grpc.ProvisionBase;
 import ai.wanaku.code.engine.camel.init.Initializer;
 import ai.wanaku.code.engine.camel.init.InitializerFactory;
@@ -29,12 +26,9 @@ import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +131,7 @@ public class CamelEngineMain implements Callable<Integer> {
     @CommandLine.Option(
             names = {"--codegen-package"},
             description = "URI of the code generation package (e.g., datastore-archive://code-gen-package.tar.bz2)",
-            required = false)
+            required = true)
     private String codegenPackage;
 
     public static void main(String[] args) {
@@ -152,7 +146,8 @@ public class CamelEngineMain implements Callable<Integer> {
                 name, address, grpcPort, ServiceType.CODE_EXECUTION_ENGINE.asValue(), "camel", "yaml", null, null);
     }
 
-    public RegistrationManager newRegistrationManager(ServiceTarget serviceTarget, ServiceConfig serviceConfig) {
+    public RegistrationManager newRegistrationManager(
+            ServiceTarget serviceTarget, CodeGenDiscoveryCallback codeGenCallback, ServiceConfig serviceConfig) {
         DiscoveryServiceHttpClient discoveryServiceHttpClient = new DiscoveryServiceHttpClient(serviceConfig);
 
         final DefaultRegistrationConfig registrationConfig = DefaultRegistrationConfig.Builder.newBuilder()
@@ -166,6 +161,7 @@ public class CamelEngineMain implements Callable<Integer> {
         ZeroDepRegistrationManager registrationManager = new ZeroDepRegistrationManager(
                 discoveryServiceHttpClient, serviceTarget, registrationConfig, new JacksonDeserializer());
 
+        registrationManager.addCallBack(codeGenCallback);
         registrationManager.start();
 
         return registrationManager;
@@ -196,34 +192,31 @@ public class CamelEngineMain implements Callable<Integer> {
         // 4. Create ServicesHttpClient for downloading resources
         ServicesHttpClient servicesHttpClient = new ServicesHttpClient(serviceConfig);
 
-        // 5. Create ServiceTarget and RegistrationManager
+        // 5. Create code generation discovery callback
+        CodeGenDiscoveryCallback codeGenCallback =
+                new CodeGenDiscoveryCallback(codegenPackage, servicesHttpClient, dataDirPath, name);
+
+        // 6. Create ServiceTarget and RegistrationManager with callback
         final ServiceTarget serviceTarget = newServiceTarget();
-        RegistrationManager registrationManager = newRegistrationManager(serviceTarget, serviceConfig);
+        RegistrationManager registrationManager = newRegistrationManager(serviceTarget, codeGenCallback, serviceConfig);
 
-        // 6. Initialize code generation tools if package is specified
-        CodeGenToolService codeGenToolService = null;
-        CodeGenToolRegistrar codeGenToolRegistrar = null;
-
-        if (codegenPackage != null && !codegenPackage.isEmpty()) {
-            try {
-                codeGenToolService = initializeCodeGenTools(servicesHttpClient, dataDirPath);
-                if (codeGenToolService != null && codeGenToolService.isReady()) {
-                    CodeGenResourceLoader resourceLoader =
-                            CodeGenResourceLoader.load(getCodeGenPackagePath(dataDirPath));
-                    codeGenToolRegistrar = new CodeGenToolRegistrar(servicesHttpClient, resourceLoader, name);
-                    codeGenToolRegistrar.registerTools();
-                }
-            } catch (Exception e) {
-                LOG.warn("Failed to initialize code generation tools: {}. Continuing without them.", e.getMessage());
-            }
+        // 7. Wait for code generation tools to initialize
+        LOG.info("Waiting for code generation tools to initialize...");
+        boolean initialized = codeGenCallback.waitForInitialization();
+        if (!initialized) {
+            LOG.error("Failed to initialize code generation tools");
+            return 1;
         }
 
+        CodeGenToolService codeGenToolService = codeGenCallback.getToolService();
+
         try {
-            // 7. Create and start gRPC server with CodeExecutorService
+            // 8. Create and start gRPC server with CodeExecutorService and ToolInvokerService
             final ServerBuilder<?> serverBuilder =
                     Grpc.newServerBuilderForPort(grpcPort, InsecureServerCredentials.create());
             final Server server = serverBuilder
                     .addService(new CodeExecutorService(servicesHttpClient, dataDirPath, repositories))
+                    .addService(new CodeGenToolInvokerService(codeGenToolService))
                     .addService(new ProvisionBase(name))
                     .build();
 
@@ -232,72 +225,9 @@ public class CamelEngineMain implements Callable<Integer> {
             LOG.info("Code Execution Engine started successfully");
             server.awaitTermination();
         } finally {
-            if (codeGenToolRegistrar != null) {
-                codeGenToolRegistrar.deregisterTools();
-            }
             registrationManager.deregister();
         }
 
         return 0;
-    }
-
-    /**
-     * Initializes code generation tools by downloading and extracting the package.
-     *
-     * @param servicesHttpClient the HTTP client for downloading
-     * @param dataDirPath the data directory path
-     * @return the initialized CodeGenToolService, or null if initialization fails
-     */
-    private CodeGenToolService initializeCodeGenTools(ServicesHttpClient servicesHttpClient, Path dataDirPath) {
-        LOG.info("Initializing code generation tools from: {}", codegenPackage);
-
-        try {
-            DownloaderFactory downloaderFactory = new DownloaderFactory(servicesHttpClient, dataDirPath);
-
-            // Download and extract the package
-            URI packageUri = URI.create(codegenPackage);
-            ResourceRefs<URI> resourceRef = new ResourceRefs<>(ResourceType.CODEGEN_PACKAGE, packageUri);
-            Map<ResourceType, Path> downloadedResources = new HashMap<>();
-
-            downloaderFactory.getDownloader(packageUri).downloadResource(resourceRef, downloadedResources);
-
-            Path packagePath = downloadedResources.get(ResourceType.CODEGEN_PACKAGE);
-            if (packagePath == null) {
-                LOG.warn("Code generation package download failed");
-                return CodeGenToolService.unready();
-            }
-
-            // Load resources and create service
-            CodeGenResourceLoader resourceLoader = CodeGenResourceLoader.load(packagePath);
-            CodeGenToolService service = new CodeGenToolService(resourceLoader);
-
-            LOG.info("Code generation tools initialized successfully");
-            return service;
-
-        } catch (Exception e) {
-            LOG.warn("Failed to initialize code generation tools: {}", e.getMessage(), e);
-            return CodeGenToolService.unready();
-        }
-    }
-
-    /**
-     * Returns the path where the code generation package is extracted.
-     *
-     * @param dataDirPath the data directory path
-     * @return the package extraction path
-     */
-    private Path getCodeGenPackagePath(Path dataDirPath) {
-        if (codegenPackage == null) {
-            return null;
-        }
-        URI packageUri = URI.create(codegenPackage);
-        String fileName = packageUri.getHost();
-        // Remove archive extensions
-        if (fileName.endsWith(".tar.bz2")) {
-            fileName = fileName.substring(0, fileName.length() - 8);
-        } else if (fileName.endsWith(".tar.bz")) {
-            fileName = fileName.substring(0, fileName.length() - 7);
-        }
-        return dataDirPath.resolve(fileName);
     }
 }

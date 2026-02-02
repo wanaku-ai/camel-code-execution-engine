@@ -24,12 +24,12 @@
 
 **Purpose**: Project initialization and dependency configuration
 
-- [ ] T001 Add Apache Commons Compress dependency to pom.xml with version property
-- [ ] T002 [P] Create package directory src/main/java/ai/wanaku/code/engine/camel/codegen/
-- [ ] T003 [P] Create package directory src/main/java/ai/wanaku/code/engine/camel/codegen/tools/
-- [ ] T004 [P] Create test package directory src/test/java/ai/wanaku/code/engine/camel/codegen/
-- [ ] T005 [P] Create test package directory src/test/java/ai/wanaku/code/engine/camel/codegen/tools/
-- [ ] T006 [P] Create integration test directory src/test/java/ai/wanaku/code/engine/camel/integration/
+- [x] T001 Add Apache Commons Compress dependency to pom.xml with version property
+- [x] T002 [P] Create package directory src/main/java/ai/wanaku/code/engine/camel/codegen/
+- [x] T003 [P] Create package directory src/main/java/ai/wanaku/code/engine/camel/codegen/tools/
+- [x] T004 [P] Create test package directory src/test/java/ai/wanaku/code/engine/camel/codegen/
+- [x] T005 [P] Create test package directory src/test/java/ai/wanaku/code/engine/camel/codegen/tools/
+- [x] T006 [P] Create integration test directory src/test/java/ai/wanaku/code/engine/camel/integration/
 
 ---
 
@@ -48,12 +48,12 @@
 
 ### Implementation (Foundational)
 
-- [ ] T011 Add CODEGEN_PACKAGE to ResourceType enum in src/main/java/ai/wanaku/code/engine/camel/downloader/ResourceType.java
-- [ ] T012 [P] Implement ArchiveExtractor utility in src/main/java/ai/wanaku/code/engine/camel/util/ArchiveExtractor.java
-- [ ] T013 Implement TarBz2Downloader in src/main/java/ai/wanaku/code/engine/camel/downloader/TarBz2Downloader.java (depends on T011, T012)
-- [ ] T014 Extend DownloaderFactory with TarBz2Downloader support in src/main/java/ai/wanaku/code/engine/camel/downloader/DownloaderFactory.java
-- [ ] T015 [P] Implement CodeGenConfig model in src/main/java/ai/wanaku/code/engine/camel/codegen/CodeGenConfig.java
-- [ ] T016 Implement CodeGenResourceLoader in src/main/java/ai/wanaku/code/engine/camel/codegen/CodeGenResourceLoader.java (depends on T015)
+- [x] T011 Add CODEGEN_PACKAGE to ResourceType enum in src/main/java/ai/wanaku/code/engine/camel/downloader/ResourceType.java
+- [x] T012 [P] Implement ArchiveExtractor utility in src/main/java/ai/wanaku/code/engine/camel/util/ArchiveExtractor.java
+- [x] T013 Implement TarBz2Downloader in src/main/java/ai/wanaku/code/engine/camel/downloader/TarBz2Downloader.java (depends on T011, T012)
+- [x] T014 Extend DownloaderFactory with TarBz2Downloader support in src/main/java/ai/wanaku/code/engine/camel/downloader/DownloaderFactory.java
+- [x] T015 [P] Implement CodeGenConfig model in src/main/java/ai/wanaku/code/engine/camel/codegen/CodeGenConfig.java
+- [x] T016 Implement CodeGenResourceLoader in src/main/java/ai/wanaku/code/engine/camel/codegen/CodeGenResourceLoader.java (depends on T015)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -73,9 +73,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Implement SearchServicesTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/SearchServicesTool.java
-- [ ] T019 [US1] Add context template constant for service list formatting in SearchServicesTool
-- [ ] T020 [US1] Add configurable description support reading from properties in SearchServicesTool
+- [x] T018 [US1] Implement SearchServicesTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/SearchServicesTool.java
+- [x] T019 [US1] Add context template constant for service list formatting in SearchServicesTool
+- [x] T020 [US1] Add configurable description support reading from properties in SearchServicesTool
 
 **Checkpoint**: At this point, SearchServicesTool should be fully functional and testable independently
 
@@ -93,9 +93,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Implement ReadKameletTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/ReadKameletTool.java
-- [ ] T023 [US2] Add kamelet file resolution logic (name → {name}.kamelet.yaml) in ReadKameletTool
-- [ ] T024 [US2] Add error handling for missing/invalid kamelet names in ReadKameletTool
+- [x] T022 [US2] Implement ReadKameletTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/ReadKameletTool.java
+- [x] T023 [US2] Add kamelet file resolution logic (name → {name}.kamelet.yaml) in ReadKameletTool
+- [x] T024 [US2] Add error handling for missing/invalid kamelet names in ReadKameletTool
 
 **Checkpoint**: At this point, ReadKameletTool should be fully functional and testable independently
 
@@ -113,9 +113,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Implement GenerateOrchestrationTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/GenerateOrchestrationTool.java
-- [ ] T027 [US3] Add template file reading from templates/orchestration.txt in GenerateOrchestrationTool
-- [ ] T028 [US3] Add error handling for missing template file in GenerateOrchestrationTool
+- [x] T026 [US3] Implement GenerateOrchestrationTool in src/main/java/ai/wanaku/code/engine/camel/codegen/tools/GenerateOrchestrationTool.java
+- [x] T027 [US3] Add template file reading from templates/orchestration.txt in GenerateOrchestrationTool
+- [x] T028 [US3] Add error handling for missing template file in GenerateOrchestrationTool
 
 **Checkpoint**: All three tool implementations should now be independently functional
 

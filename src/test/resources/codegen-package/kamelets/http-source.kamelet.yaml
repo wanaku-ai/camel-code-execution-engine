@@ -1,0 +1,29 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: http-source
+  labels:
+    camel.apache.org/kamelet.type: source
+spec:
+  definition:
+    title: HTTP Source
+    description: Periodically fetches data from an HTTP endpoint
+    properties:
+      url:
+        title: URL
+        description: The URL to fetch
+        type: string
+      period:
+        title: Period
+        description: The interval between polls in milliseconds
+        type: integer
+        default: 10000
+  template:
+    from:
+      uri: "timer:tick"
+      parameters:
+        period: "{{period}}"
+      steps:
+        - to:
+            uri: "http://{{url}}"
+        - to: "kamelet:sink"

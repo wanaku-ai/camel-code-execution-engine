@@ -1,0 +1,17 @@
+# Orchestration Template
+# Use the following structure to assemble your integration:
+
+- route:
+    from:
+      uri: "direct:start"
+      steps:
+        # Add your source Kamelet here
+        - to: "{{kamelet:source}}"
+        # Add any processing steps here
+        # Add your sink Kamelet here
+        - to: "{{kamelet:sink}}"
+
+# Notes:
+# - Replace {{kamelet:source}} with your source Kamelet URI
+# - Replace {{kamelet:sink}} with your sink Kamelet URI
+# - Add parameters as needed for each Kamelet

@@ -11,7 +11,6 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
@@ -34,7 +33,8 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
     public void executeCode(CodeExecutionRequest request, StreamObserver<CodeExecutionReply> responseObserver) {
         LOG.info("Received code execution request for URI: {}", request.getUri());
         LOG.info(
-                "Received code ({} bytes - showing first 500 bytes):\n{}", request.getCode().length(),
+                "Received code ({} bytes - showing first 500 bytes):\n{}",
+                request.getCode().length(),
                 request.getCode());
 
         Path workspace = null;
@@ -56,7 +56,6 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
             if (code == null || code.trim().isEmpty()) {
                 throw new IllegalArgumentException("Request code is empty or null");
             }
-
 
             // 1. Create temp workspace
             if (!Files.exists(dataDir)) {
@@ -211,14 +210,12 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         }
 
         responseObserver.onNext(CodeExecutionReply.newBuilder()
-                        .setIsError(true)
-                        .addContent(String.format("Unable to invoke tool: %s", e.getMessage()))
-                        .setExitCode(2)
-                        .setTimestamp(System.currentTimeMillis())
-                        .setOutputType(OutputType.STDERR)
-                        .setStatus(ExecutionStatus.FAILED)
-                                .build());
-
-
+                .setIsError(true)
+                .addContent(String.format("Unable to invoke tool: %s", e.getMessage()))
+                .setExitCode(2)
+                .setTimestamp(System.currentTimeMillis())
+                .setOutputType(OutputType.STDERR)
+                .setStatus(ExecutionStatus.FAILED)
+                .build());
     }
 }

@@ -20,6 +20,8 @@
         <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
         <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
+        <commons-compress.version>1.26.0</commons-compress.version>
+        <junit.version>5.11.0</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -133,6 +135,21 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>6.10.0.202406032230-r</version>
+        </dependency>
+
+        <!-- Apache Commons Compress for tar.bz2 extraction -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Other dependencies go here -->

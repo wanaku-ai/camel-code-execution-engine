@@ -61,7 +61,16 @@ available.services=kamelet:http-source,kamelet:kafka-sink,kamelet:log-action
 
 # Optional: Custom description for the search tool
 search.tool.description=Searches for available integration services
+
+# Optional: Namespace for tool registration (defaults to no namespace)
+namespace=my.custom.namespace
 ```
+
+| Property | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `available.services` | Yes | - | Comma-separated list of available services |
+| `search.tool.description` | No | "Searches for services to perform the tasks" | Description for the searchServicesTool |
+| `namespace` | No | null (no namespace) | Namespace for tool registration in Wanaku |
 
 ### Kamelet Files
 

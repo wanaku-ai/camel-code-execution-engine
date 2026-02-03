@@ -85,4 +85,59 @@ class CodeGenConfigTest {
 
         assertEquals(tempDir.resolve("subdir"), config.getBaseDirectory());
     }
+
+    @Test
+    void loadWithNamespace() throws IOException {
+        Path configFile = tempDir.resolve("config.properties");
+        Files.writeString(
+                configFile,
+                """
+                available.services=kamelet:test
+                namespace=my.custom.namespace
+                """);
+
+        CodeGenConfig config = CodeGenConfig.load(configFile);
+
+        assertEquals("my.custom.namespace", config.getNamespace());
+    }
+
+    @Test
+    void loadWithoutNamespaceReturnsNull() throws IOException {
+        Path configFile = tempDir.resolve("config.properties");
+        Files.writeString(configFile, "available.services=kamelet:test");
+
+        CodeGenConfig config = CodeGenConfig.load(configFile);
+
+        assertNull(config.getNamespace());
+    }
+
+    @Test
+    void loadWithEmptyNamespaceReturnsNull() throws IOException {
+        Path configFile = tempDir.resolve("config.properties");
+        Files.writeString(
+                configFile,
+                """
+                available.services=kamelet:test
+                namespace=
+                """);
+
+        CodeGenConfig config = CodeGenConfig.load(configFile);
+
+        assertNull(config.getNamespace());
+    }
+
+    @Test
+    void loadWithWhitespaceNamespaceReturnsNull() throws IOException {
+        Path configFile = tempDir.resolve("config.properties");
+        Files.writeString(
+                configFile,
+                """
+                available.services=kamelet:test
+                namespace=
+                """);
+
+        CodeGenConfig config = CodeGenConfig.load(configFile);
+
+        assertNull(config.getNamespace());
+    }
 }

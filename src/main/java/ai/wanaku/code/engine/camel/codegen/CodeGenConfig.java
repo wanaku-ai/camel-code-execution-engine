@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li>{@code available.services} - comma-separated list of available services</li>
  *   <li>{@code search.tool.description} - optional custom description for searchServicesTool</li>
+ *   <li>{@code namespace} - optional namespace for tool registration (defaults to null)</li>
  * </ul>
  */
 public final class CodeGenConfig {
@@ -29,16 +30,22 @@ public final class CodeGenConfig {
     /** Property key for the search tool description. */
     public static final String PROP_SEARCH_TOOL_DESCRIPTION = "search.tool.description";
 
+    /** Property key for the namespace. */
+    public static final String PROP_NAMESPACE = "namespace";
+
     /** Default description for the search services tool. */
     public static final String DEFAULT_SEARCH_TOOL_DESCRIPTION = "Searches for services to perform the tasks";
 
     private final List<String> availableServices;
     private final String searchToolDescription;
+    private final String namespace;
     private final Path configPath;
 
-    private CodeGenConfig(List<String> availableServices, String searchToolDescription, Path configPath) {
+    private CodeGenConfig(
+            List<String> availableServices, String searchToolDescription, String namespace, Path configPath) {
         this.availableServices = Collections.unmodifiableList(new ArrayList<>(availableServices));
         this.searchToolDescription = searchToolDescription;
+        this.namespace = namespace;
         this.configPath = configPath;
     }
 
@@ -73,9 +80,14 @@ public final class CodeGenConfig {
 
         String description = props.getProperty(PROP_SEARCH_TOOL_DESCRIPTION, DEFAULT_SEARCH_TOOL_DESCRIPTION);
 
-        LOG.debug("Loaded {} services, description: {}", services.size(), description);
+        String namespace = props.getProperty(PROP_NAMESPACE);
+        if (namespace != null && namespace.trim().isEmpty()) {
+            namespace = null;
+        }
 
-        return new CodeGenConfig(services, description, configPath);
+        LOG.debug("Loaded {} services, description: {}, namespace: {}", services.size(), description, namespace);
+
+        return new CodeGenConfig(services, description, namespace, configPath);
     }
 
     private static List<String> parseServicesList(String servicesStr) {
@@ -112,6 +124,15 @@ public final class CodeGenConfig {
     }
 
     /**
+     * Returns the namespace for tool registration.
+     *
+     * @return the namespace, or null if not configured
+     */
+    public String getNamespace() {
+        return namespace;
+    }
+
+    /**
      * Returns the path to the configuration file.
      *
      * @return the config file path
@@ -133,7 +154,8 @@ public final class CodeGenConfig {
     public String toString() {
         return "CodeGenConfig{" + "availableServices="
                 + availableServices + ", searchToolDescription='"
-                + searchToolDescription + '\'' + ", configPath="
+                + searchToolDescription + '\'' + ", namespace='"
+                + namespace + '\'' + ", configPath="
                 + configPath + '}';
     }
 }

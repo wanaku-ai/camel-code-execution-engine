@@ -122,12 +122,37 @@ public class CodeGenToolRegistrar {
         return serviceName + "://" + toolName;
     }
 
+    /**
+     * Returns the configured namespace, or null if not set.
+     *
+     * @return the namespace from config, or null
+     */
+    private String getNamespace() {
+        return resourceLoader.getConfig().getNamespace();
+    }
+
+    /**
+     * Applies common settings to a tool reference.
+     *
+     * @param ref the tool reference to configure
+     * @param name the tool name
+     * @param description the tool description
+     */
+    private void applyCommonSettings(ToolReference ref, String name, String description) {
+        ref.setName(name);
+        ref.setDescription(description);
+        ref.setUri(buildToolUri(name));
+        ref.setType(serviceName);
+
+        String namespace = getNamespace();
+        if (namespace != null) {
+            ref.setNamespace(namespace);
+        }
+    }
+
     private ToolReference createSearchServicesToolReference(SearchServicesTool tool) {
         ToolReference ref = new ToolReference();
-        ref.setName(tool.getName());
-        ref.setDescription(tool.getDescription());
-        ref.setUri(buildToolUri(tool.getName()));
-        ref.setType(serviceName);
+        applyCommonSettings(ref, tool.getName(), tool.getDescription());
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();
@@ -141,10 +166,7 @@ public class CodeGenToolRegistrar {
 
     private ToolReference createReadKameletToolReference(ReadKameletTool tool) {
         ToolReference ref = new ToolReference();
-        ref.setName(tool.getName());
-        ref.setDescription(tool.getDescription());
-        ref.setUri(buildToolUri(tool.getName()));
-        ref.setType(serviceName);
+        applyCommonSettings(ref, tool.getName(), tool.getDescription());
 
         // Input schema with 'name' parameter
         InputSchema schema = new InputSchema();
@@ -165,10 +187,7 @@ public class CodeGenToolRegistrar {
 
     private ToolReference createGenerateOrchestrationToolReference(GenerateOrchestrationTool tool) {
         ToolReference ref = new ToolReference();
-        ref.setName(tool.getName());
-        ref.setDescription(tool.getDescription());
-        ref.setUri(buildToolUri(tool.getName()));
-        ref.setType(serviceName);
+        applyCommonSettings(ref, tool.getName(), tool.getDescription());
 
         // Empty input schema (no parameters)
         InputSchema schema = new InputSchema();

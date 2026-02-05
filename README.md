@@ -43,6 +43,9 @@ The Camel Code Execution Engine (CCE) serves two primary functions:
 - **Git Initialization**: Optional repository cloning at startup
 - **Multi-platform Deployment**: Local, Docker, Kubernetes/OpenShift
 
+> [NOTE]
+> The MCP tools are not YET functional. The agent MUST provide and the execution workflow.
+
 ## Quick Start
 
 ### Requirements

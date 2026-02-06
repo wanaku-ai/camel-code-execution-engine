@@ -20,7 +20,7 @@
         <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
         <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
-        <commons-compress.version>1.26.0</commons-compress.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <junit.version>5.11.0</junit.version>
     </properties>
 

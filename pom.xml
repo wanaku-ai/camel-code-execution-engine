@@ -21,7 +21,7 @@
         <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <commons-compress.version>1.26.0</commons-compress.version>
-        <junit.version>5.11.0</junit.version>
+        <junit.version>6.0.2</junit.version>
     </properties>
 
     <dependencyManagement>

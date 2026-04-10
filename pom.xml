@@ -21,7 +21,7 @@
         <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
         <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
-        <commons-compress.version>1.26.0</commons-compress.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <junit.version>5.14.3</junit.version>
         <jgit.version>7.6.0.202603022253-r</jgit.version>
         <palantir-format-version.version>2.71.0</palantir-format-version.version>

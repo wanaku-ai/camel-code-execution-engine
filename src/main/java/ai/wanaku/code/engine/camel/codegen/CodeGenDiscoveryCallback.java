@@ -4,8 +4,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +11,7 @@ import ai.wanaku.capabilities.sdk.api.discovery.DiscoveryCallback;
 import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;
 import ai.wanaku.capabilities.sdk.api.types.providers.ServiceTarget;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
-import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
-import ai.wanaku.code.engine.camel.downloader.ResourceType;
+import ai.wanaku.code.engine.camel.downloader.TarBz2Downloader;
 
 /**
  * Discovery callback that initializes and registers code generation tools.
@@ -147,15 +143,10 @@ public class CodeGenDiscoveryCallback implements DiscoveryCallback {
      */
     private Path downloadPackage() {
         try {
-            DownloaderFactory downloaderFactory = new DownloaderFactory(servicesHttpClient, dataDirPath);
-
+            TarBz2Downloader archiveDownloader = new TarBz2Downloader(servicesHttpClient, dataDirPath);
             URI packageUri = URI.create(codegenPackageUri);
-            ResourceRefs<URI> resourceRef = new ResourceRefs<>(ResourceType.CODEGEN_PACKAGE, packageUri);
-            Map<ResourceType, Path> downloadedResources = new HashMap<>();
 
-            downloaderFactory.getDownloader(packageUri).downloadResource(resourceRef, downloadedResources);
-
-            Path downloaded = downloadedResources.get(ResourceType.CODEGEN_PACKAGE);
+            Path downloaded = archiveDownloader.downloadAndExtract(packageUri);
             if (downloaded == null) {
                 LOG.error("Code generation package download failed");
             }

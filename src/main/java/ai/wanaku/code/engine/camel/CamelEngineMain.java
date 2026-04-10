@@ -22,15 +22,15 @@ import ai.wanaku.capabilities.sdk.discovery.ZeroDepRegistrationManager;
 import ai.wanaku.capabilities.sdk.discovery.config.DefaultRegistrationConfig;
 import ai.wanaku.capabilities.sdk.discovery.deserializer.JacksonDeserializer;
 import ai.wanaku.capabilities.sdk.discovery.util.DiscoveryHelper;
+import ai.wanaku.capabilities.sdk.runtime.camel.grpc.ProvisionBase;
+import ai.wanaku.capabilities.sdk.runtime.camel.init.Initializer;
+import ai.wanaku.capabilities.sdk.runtime.camel.init.InitializerFactory;
 import ai.wanaku.capabilities.sdk.security.TokenEndpoint;
 import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
 import ai.wanaku.code.engine.camel.codegen.CodeGenDiscoveryCallback;
 import ai.wanaku.code.engine.camel.codegen.CodeGenToolService;
 import ai.wanaku.code.engine.camel.grpc.CodeExecutorService;
 import ai.wanaku.code.engine.camel.grpc.CodeGenToolInvokerService;
-import ai.wanaku.code.engine.camel.grpc.ProvisionBase;
-import ai.wanaku.code.engine.camel.init.Initializer;
-import ai.wanaku.code.engine.camel.init.InitializerFactory;
 import ai.wanaku.code.engine.camel.util.VersionHelper;
 import picocli.CommandLine;
 

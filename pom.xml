@@ -14,7 +14,7 @@
         <log4j.version>2.25.4</log4j.version>
         <picocli.version>4.7.7</picocli.version>
         <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
-        <wanaku-capabilities-sdk.version>0.1.1-SNAPSHOT</wanaku-capabilities-sdk.version>
+        <wanaku-capabilities-sdk.version>0.1.0</wanaku-capabilities-sdk.version>
         <camel.version>4.18.1</camel.version>
         <jackson-databind.version>2.21.2</jackson-databind.version>
         <snakeyaml.version>2.0</snakeyaml.version>
@@ -81,8 +81,7 @@
         </dependency>
         <dependency>
             <groupId>ai.wanaku.sdk</groupId>
-            <artifactId>capabilities-runtimes-camel-common</artifactId>
-            <version>${wanaku-capabilities-sdk.version}</version>
+            <artifactId>capabilities-runtime-camel-common</artifactId>
         </dependency>
 
 

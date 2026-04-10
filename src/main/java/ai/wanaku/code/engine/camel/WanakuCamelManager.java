@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
-import ai.wanaku.code.engine.camel.downloader.ResourceType;
-import ai.wanaku.code.engine.camel.util.WanakuRoutesLoader;
+import ai.wanaku.capabilities.sdk.runtime.camel.downloader.ResourceType;
+import ai.wanaku.capabilities.sdk.runtime.camel.util.WanakuRoutesLoader;
 
 public class WanakuCamelManager {
     private final CamelContext context;
@@ -49,6 +49,10 @@ public class WanakuCamelManager {
         String routeFileUrl = String.format("file://%s", routesPath);
         routesLoader.loadRoute(context, routeFileUrl);
         context.start();
+
+        if (context.getRoutes().isEmpty()) {
+            throw new RuntimeException("Failed to load routes from " + routeFileUrl);
+        }
     }
 
     public CamelContext getCamelContext() {

@@ -1,12 +1,5 @@
 package ai.wanaku.code.engine.camel.codegen;
 
-import ai.wanaku.capabilities.sdk.api.discovery.DiscoveryCallback;
-import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;
-import ai.wanaku.capabilities.sdk.api.types.providers.ServiceTarget;
-import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
-import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
-import ai.wanaku.code.engine.camel.downloader.ResourceType;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +9,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ai.wanaku.capabilities.sdk.api.discovery.DiscoveryCallback;
+import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;
+import ai.wanaku.capabilities.sdk.api.types.providers.ServiceTarget;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.downloader.DownloaderFactory;
+import ai.wanaku.code.engine.camel.downloader.ResourceRefs;
+import ai.wanaku.code.engine.camel.downloader.ResourceType;
 
 /**
  * Discovery callback that initializes and registers code generation tools.

@@ -1,5 +1,15 @@
 package ai.wanaku.code.engine.camel;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.grpc.Grpc;
+import io.grpc.InsecureServerCredentials;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import ai.wanaku.capabilities.sdk.api.discovery.RegistrationManager;
 import ai.wanaku.capabilities.sdk.api.types.providers.ServiceTarget;
 import ai.wanaku.capabilities.sdk.api.types.providers.ServiceType;
@@ -22,16 +32,6 @@ import ai.wanaku.code.engine.camel.grpc.ProvisionBase;
 import ai.wanaku.code.engine.camel.init.Initializer;
 import ai.wanaku.code.engine.camel.init.InitializerFactory;
 import ai.wanaku.code.engine.camel.util.VersionHelper;
-import io.grpc.Grpc;
-import io.grpc.InsecureServerCredentials;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.Callable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 public class CamelEngineMain implements Callable<Integer> {

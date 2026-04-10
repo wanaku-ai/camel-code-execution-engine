@@ -11,17 +11,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <slf4j.version>2.0.17</slf4j.version>
-        <log4j.version>2.25.3</log4j.version>
+        <log4j.version>2.25.4</log4j.version>
         <picocli.version>4.7.7</picocli.version>
         <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
-        <wanaku.sdk.version>0.1.0-SNAPSHOT</wanaku.sdk.version>
-        <camel.version>4.17.0</camel.version>
+        <wanaku-capabilities-sdk.version>0.1.0</wanaku-capabilities-sdk.version>
+        <camel.version>4.18.1</camel.version>
+        <jackson-databind.version>2.21.2</jackson-databind.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
-        <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
+        <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
         <commons-compress.version>1.26.0</commons-compress.version>
-        <junit.version>5.11.0</junit.version>
+        <junit.version>5.14.3</junit.version>
+        <jgit.version>7.6.0.202603022253-r</jgit.version>
+        <palantir-format-version.version>2.71.0</palantir-format-version.version>
     </properties>
 
     <dependencyManagement>
@@ -44,7 +47,7 @@
             <dependency>
                 <groupId>ai.wanaku.sdk</groupId>
                 <artifactId>capabilities-bom</artifactId>
-                <version>${wanaku.sdk.version}</version>
+                <version>${wanaku-capabilities-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -70,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>ai.wanaku.sdk</groupId>
-            <artifactId>capabilities-runtime</artifactId>
+            <artifactId>capabilities-runtimes-common</artifactId>
         </dependency>
         <dependency>
             <groupId>ai.wanaku.sdk</groupId>
@@ -134,7 +137,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>7.5.0.202512021534-r</version>
+            <version>${jgit.version}</version>
         </dependency>
 
         <!-- Apache Commons Compress for tar.bz2 extraction -->
@@ -212,10 +215,21 @@
                     <configuration>
                         <java>
                             <palantirJavaFormat>
-                                <version>2.71.0</version>
+                                <version>${palantir-format-version.version}</version>
                             </palantirJavaFormat>
                             <removeUnusedImports />
                             <formatAnnotations />
+                            <forbidWildcardImports />
+
+                            <excludes>
+                                <exclude>**/*.properties</exclude>
+                                <exclude>**/*.proto</exclude>
+                            </excludes>
+
+                            <importOrder>
+                                <wildcardsLast>true</wildcardsLast>
+                                <order>jakarta|javax,org.w3c|org.xml,java|org|io|,,\#,org.junit|org.mockito|\#org.assertj|\#org.junit|\#org.mockito</order>
+                            </importOrder>
                         </java>
                     </configuration>
                     <executions>

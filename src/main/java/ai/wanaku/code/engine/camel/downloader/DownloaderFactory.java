@@ -1,10 +1,10 @@
 package ai.wanaku.code.engine.camel.downloader;
 
-import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
 import java.net.URI;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
 
 /**
  * Factory for creating downloader instances based on URI scheme.

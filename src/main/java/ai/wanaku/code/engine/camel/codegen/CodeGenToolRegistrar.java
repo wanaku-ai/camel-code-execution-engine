@@ -1,12 +1,5 @@
 package ai.wanaku.code.engine.camel.codegen;
 
-import ai.wanaku.capabilities.sdk.api.types.InputSchema;
-import ai.wanaku.capabilities.sdk.api.types.Property;
-import ai.wanaku.capabilities.sdk.api.types.ToolReference;
-import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.codegen.tools.GenerateOrchestrationTool;
-import ai.wanaku.code.engine.camel.codegen.tools.ReadKameletTool;
-import ai.wanaku.code.engine.camel.codegen.tools.SearchServicesTool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +7,13 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ai.wanaku.capabilities.sdk.api.types.InputSchema;
+import ai.wanaku.capabilities.sdk.api.types.Property;
+import ai.wanaku.capabilities.sdk.api.types.ToolReference;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.codegen.tools.GenerateOrchestrationTool;
+import ai.wanaku.code.engine.camel.codegen.tools.ReadKameletTool;
+import ai.wanaku.code.engine.camel.codegen.tools.SearchServicesTool;
 
 /**
  * Registers and deregisters code generation tools with Wanaku.

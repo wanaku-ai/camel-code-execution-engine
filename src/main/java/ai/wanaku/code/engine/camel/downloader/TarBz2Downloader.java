@@ -1,9 +1,5 @@
 package ai.wanaku.code.engine.camel.downloader;
 
-import ai.wanaku.capabilities.sdk.api.types.DataStore;
-import ai.wanaku.capabilities.sdk.api.types.WanakuResponse;
-import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.util.ArchiveExtractor;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.file.Files;
@@ -13,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ai.wanaku.capabilities.sdk.api.types.DataStore;
+import ai.wanaku.capabilities.sdk.api.types.WanakuResponse;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.util.ArchiveExtractor;
 
 /**
  * Downloads and extracts tar.bz2 archives from the Wanaku data store.

@@ -1,15 +1,15 @@
 package ai.wanaku.code.engine.camel.grpc;
 
+import java.util.Map;
+import io.grpc.stub.StreamObserver;
 import ai.wanaku.capabilities.sdk.config.provider.api.ConfigProvisioner;
 import ai.wanaku.capabilities.sdk.config.provider.api.ProvisionedConfig;
 import ai.wanaku.capabilities.sdk.runtime.provisioners.FileProvisionerLoader;
 import ai.wanaku.capabilities.sdk.util.ProvisioningHelper;
-import ai.wanaku.core.exchange.PropertySchema;
-import ai.wanaku.core.exchange.ProvisionReply;
-import ai.wanaku.core.exchange.ProvisionRequest;
-import ai.wanaku.core.exchange.ProvisionerGrpc;
-import io.grpc.stub.StreamObserver;
-import java.util.Map;
+import ai.wanaku.core.exchange.v1.PropertySchema;
+import ai.wanaku.core.exchange.v1.ProvisionReply;
+import ai.wanaku.core.exchange.v1.ProvisionRequest;
+import ai.wanaku.core.exchange.v1.ProvisionerGrpc;
 
 public class ProvisionBase extends ProvisionerGrpc.ProvisionerImplBase {
 

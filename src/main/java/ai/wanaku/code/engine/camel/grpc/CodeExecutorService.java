@@ -1,20 +1,22 @@
 package ai.wanaku.code.engine.camel.grpc;
 
-import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
-import ai.wanaku.code.engine.camel.WanakuCamelManager;
-import ai.wanaku.core.exchange.CodeExecutionReply;
-import ai.wanaku.core.exchange.CodeExecutionRequest;
-import ai.wanaku.core.exchange.CodeExecutorGrpc;
-import ai.wanaku.core.exchange.ExecutionStatus;
-import ai.wanaku.core.exchange.OutputType;
-import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.grpc.stub.StreamObserver;
+import ai.wanaku.capabilities.sdk.services.ServicesHttpClient;
+import ai.wanaku.code.engine.camel.WanakuCamelManager;
+import ai.wanaku.core.exchange.v1.CodeExecutionReply;
+import ai.wanaku.core.exchange.v1.CodeExecutionRequest;
+import ai.wanaku.core.exchange.v1.CodeExecutorGrpc;
+import ai.wanaku.core.exchange.v1.ExecutionStatus;
+import ai.wanaku.core.exchange.v1.OutputType;
+import com.google.protobuf.Timestamp;
 
 public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
     private static final Logger LOG = LoggerFactory.getLogger(CodeExecutorService.class);
@@ -29,6 +31,14 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         this.defaultRepositories = defaultRepositories;
     }
 
+    private static Timestamp now() {
+        Instant instant = Instant.now();
+        return Timestamp.newBuilder()
+                .setSeconds(instant.getEpochSecond())
+                .setNanos(instant.getNano())
+                .build();
+    }
+
     @Override
     public void executeCode(CodeExecutionRequest request, StreamObserver<CodeExecutionReply> responseObserver) {
         LOG.info("Received code execution request for URI: {}", request.getUri());
@@ -41,14 +51,11 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         WanakuCamelManager camelManager = null;
 
         try {
-            long timestamp = System.currentTimeMillis();
-
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
                     .addContent("Creating workspace")
-                    .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.PENDING)
-                    .setTimestamp(timestamp)
+                    .setOutputType(OutputType.OUTPUT_TYPE_STATUS)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_PENDING)
+                    .setTimestamp(now())
                     .build());
 
             // 0. Validate request has code
@@ -76,11 +83,10 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
             }
 
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
                     .addContent("Routes written to workspace")
-                    .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.PENDING)
-                    .setTimestamp(System.currentTimeMillis())
+                    .setOutputType(OutputType.OUTPUT_TYPE_STATUS)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_PENDING)
+                    .setTimestamp(now())
                     .build());
 
             // 3. Extract dependencies from arguments map
@@ -93,11 +99,10 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
 
             // 5. Create WanakuCamelManager and load routes
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
                     .addContent("Initializing Camel context and loading routes")
-                    .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.RUNNING)
-                    .setTimestamp(System.currentTimeMillis())
+                    .setOutputType(OutputType.OUTPUT_TYPE_STATUS)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_RUNNING)
+                    .setTimestamp(now())
                     .build());
 
             LOG.info("Starting Camel Context");
@@ -105,20 +110,18 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
             LOG.info("CamelContext started with routes");
 
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
                     .addContent("Camel routes loaded and context started")
-                    .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.RUNNING)
-                    .setTimestamp(System.currentTimeMillis())
+                    .setOutputType(OutputType.OUTPUT_TYPE_STATUS)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_RUNNING)
+                    .setTimestamp(now())
                     .build());
 
             // 6. Stream execution status - the routes are already running in the CamelContext
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(false)
                     .addContent("Routes are now executing")
-                    .setOutputType(OutputType.STATUS)
-                    .setStatus(ExecutionStatus.RUNNING)
-                    .setTimestamp(System.currentTimeMillis())
+                    .setOutputType(OutputType.OUTPUT_TYPE_STATUS)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_RUNNING)
+                    .setTimestamp(now())
                     .build());
 
             final CamelContext camelContext = camelManager.getCamelContext();
@@ -129,20 +132,18 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
                 final String reply = producerTemplate.requestBody("direct:start", body, String.class);
 
                 responseObserver.onNext(CodeExecutionReply.newBuilder()
-                        .setIsError(false)
-                        .setOutputType(OutputType.STDOUT)
-                        .setStatus(ExecutionStatus.COMPLETED)
+                        .setOutputType(OutputType.OUTPUT_TYPE_STDOUT)
+                        .setStatus(ExecutionStatus.EXECUTION_STATUS_COMPLETED)
                         .addContent(reply.toString())
                         .build());
 
                 // 8. Send completion status
                 responseObserver.onNext(CodeExecutionReply.newBuilder()
-                        .setIsError(false)
                         .addContent("Execution completed successfully")
-                        .setOutputType(OutputType.COMPLETION)
-                        .setStatus(ExecutionStatus.COMPLETED)
+                        .setOutputType(OutputType.OUTPUT_TYPE_COMPLETION)
+                        .setStatus(ExecutionStatus.EXECUTION_STATUS_COMPLETED)
                         .setExitCode(0)
-                        .setTimestamp(System.currentTimeMillis())
+                        .setTimestamp(now())
                         .build());
 
                 responseObserver.onCompleted();
@@ -155,12 +156,11 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         } catch (Exception e) {
             LOG.error("Error during code execution", e);
             responseObserver.onNext(CodeExecutionReply.newBuilder()
-                    .setIsError(true)
                     .addContent("Execution failed: " + e.getMessage())
-                    .setOutputType(OutputType.STDERR)
-                    .setStatus(ExecutionStatus.FAILED)
+                    .setOutputType(OutputType.OUTPUT_TYPE_STDERR)
+                    .setStatus(ExecutionStatus.EXECUTION_STATUS_FAILED)
                     .setExitCode(1)
-                    .setTimestamp(System.currentTimeMillis())
+                    .setTimestamp(now())
                     .build());
             responseObserver.onCompleted();
         } finally {
@@ -210,12 +210,11 @@ public class CodeExecutorService extends CodeExecutorGrpc.CodeExecutorImplBase {
         }
 
         responseObserver.onNext(CodeExecutionReply.newBuilder()
-                .setIsError(true)
                 .addContent(String.format("Unable to invoke tool: %s", e.getMessage()))
                 .setExitCode(2)
-                .setTimestamp(System.currentTimeMillis())
-                .setOutputType(OutputType.STDERR)
-                .setStatus(ExecutionStatus.FAILED)
+                .setTimestamp(now())
+                .setOutputType(OutputType.OUTPUT_TYPE_STDERR)
+                .setStatus(ExecutionStatus.EXECUTION_STATUS_FAILED)
                 .build());
     }
 }

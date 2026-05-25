@@ -66,7 +66,7 @@ mvn clean package
 ### Running the Service
 
 ```bash
-java -jar target/camel-code-execution-engine.jar \
+java -jar target/camel-code-execution-engine-app.jar \
   --registration-url http://wanaku:8080 \
   --registration-announce-address localhost \
   --client-id my-client-id \
@@ -133,7 +133,7 @@ namespace=optional.namespace
 Run directly with Java for development:
 
 ```bash
-java -jar camel-code-execution-engine.jar [options]
+java -jar camel-code-execution-engine-app.jar [options]
 ```
 
 ### Docker

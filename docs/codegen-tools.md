@@ -17,7 +17,7 @@ When configured with a code generation package, the engine registers three tools
 ### Command Line Option
 
 ```bash
-java -jar camel-code-execution-engine.jar \
+java -jar camel-code-execution-engine-app.jar \
   --codegen-package <path-or-uri> \
   --name my-service \
   ...
@@ -159,7 +159,7 @@ Returns the orchestration template content.
 For development and testing, you can point to a local directory:
 
 ```bash
-java -jar camel-code-execution-engine.jar \
+java -jar camel-code-execution-engine-app.jar \
   --codegen-package /home/user/my-codegen-package \
   --name my-service \
   --registration-url http://localhost:8080 \
@@ -173,7 +173,7 @@ java -jar camel-code-execution-engine.jar \
 For production, upload a tar.bz2 archive to the Wanaku data store and reference it:
 
 ```bash
-java -jar camel-code-execution-engine.jar \
+java -jar camel-code-execution-engine-app.jar \
   --codegen-package datastore-archive://codegen-package.tar.bz2 \
   --name code-execution-engine \
   --registration-url http://wanaku.example.com \

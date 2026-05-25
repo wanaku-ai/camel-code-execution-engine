@@ -2,10 +2,10 @@
 
 This rule file contains project-specific metadata used by OSS Helper commands. Commands detect the current project by matching `git remote get-url origin` against the remote pattern below.
 
-- **Remote pattern:** `wanaku-ai/camel-integration-capability`
-- **GitHub repo:** `wanaku-ai/camel-integration-capability`
+- **Remote pattern:** `wanaku-ai/camel-code-execution-engine`
+- **GitHub repo:** `wanaku-ai/camel-code-execution-engine`
 - **Issue tracker:** GitHub
-- **Issue tracker URL:** `https://github.com/wanaku-ai/camel-integration-capability/issues`
+- **Issue tracker URL:** `https://github.com/wanaku-ai/camel-code-execution-engine/issues`
 - **Issue ID format:** numeric
 - **SonarCloud component key:** _(none)_
 - **Documentation URL:** _(none)_

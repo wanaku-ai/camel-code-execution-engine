@@ -83,6 +83,10 @@
             <groupId>ai.wanaku.sdk</groupId>
             <artifactId>capabilities-runtimes-camel-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ai.wanaku.sdk</groupId>
+            <artifactId>capabilities-maven-downloader</artifactId>
+        </dependency>
 
 
         <dependency>

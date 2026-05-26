@@ -42,7 +42,7 @@ The `--codegen-package` option accepts two formats:
 
 The code generation package must have the following structure:
 
-```
+```text
 my-package/
 ├── config.properties      # Required: Configuration file
 ├── kamelets/              # Required: Directory containing Kamelet YAML files
@@ -96,7 +96,7 @@ The `templates/orchestration.txt` file contains the template returned by the `ge
 
 Tools are registered with Wanaku using the service name as the URI scheme:
 
-```
+```text
 <service-name>://searchServicesTool
 <service-name>://readKamelet
 <service-name>://generateOrchestrationCode
@@ -104,7 +104,7 @@ Tools are registered with Wanaku using the service name as the URI scheme:
 
 For example, with `--name code-execution-engine`:
 
-```
+```text
 code-execution-engine://searchServicesTool
 code-execution-engine://readKamelet
 code-execution-engine://generateOrchestrationCode
@@ -119,7 +119,8 @@ Returns a formatted list of available services with context explaining how to us
 **Parameters:** None
 
 **Response:**
-```
+
+```text
 # Context
 - The list below contains Kamelets that can be used to assemble the orchestration.
 - A Kamelet is a snippet for a Camel route.

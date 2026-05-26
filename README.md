@@ -15,7 +15,7 @@ The Camel Code Execution Engine (CCE) serves two primary functions:
 
 ## Architecture
 
-```
+```text
 ┌─────────────────┐     ┌─────────────────────┐     ┌──────────────────┐
 │    AI Agent     │────▶│  Wanaku MCP Router  │────▶│  Code Execution  │
 │                 │     │                     │     │     Engine       │
@@ -101,7 +101,7 @@ Once started, the service registers with the Wanaku router and exposes its tools
 
 The `--codegen-package` must point to a directory or archive containing:
 
-```
+```text
 package/
 ├── config.properties          # Service list configuration
 ├── kamelets/                  # Kamelet YAML definitions
@@ -112,6 +112,7 @@ package/
 ```
 
 **config.properties** format:
+
 ```properties
 available.services=kamelet:service1,kamelet:service2
 search.tool.description=Custom description for search tool

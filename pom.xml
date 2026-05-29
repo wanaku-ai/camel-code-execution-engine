@@ -18,7 +18,7 @@
         <jackson-databind.version>2.21.2</jackson-databind.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <project.main.class>ai.wanaku.code.engine.camel.CamelEngineMain</project.main.class>
-        <spotless-maven-plugin.version>3.5.1</spotless-maven-plugin.version>
+        <spotless-maven-plugin.version>3.6.0</spotless-maven-plugin.version>
         <maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <junit.version>5.14.3</junit.version>
